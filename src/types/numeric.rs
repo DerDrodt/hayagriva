@@ -274,7 +274,6 @@ impl FromStr for Numeric {
             s.eat_while(|c: char| !c.is_numeric() && !c.is_whitespace() && c != '-');
 
         let value = number(&mut s).ok_or(NumericError::NoNumber)?;
-        s.eat_whitespace();
 
         let value = match s.peek() {
             Some(c) if is_delimiter(c) => {
@@ -299,8 +298,7 @@ impl FromStr for Numeric {
 
             _ => NumericValue::Number(value),
         };
-        s.eat_whitespace();
-        let post = s.eat_while(|c: char| !c.is_whitespace());
+        let post = s.eat_while(|_| true);
 
         if !s.after().is_empty() {
             return Err(NumericError::UnexpectedCharactersAfterPostfix);

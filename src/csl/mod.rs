@@ -252,12 +252,36 @@ impl<'a, T: EntryLike + Hash + PartialEq + Eq + Debug> BibliographyDriver<'a, T>
                 break;
             }
 
-            for cite in res.iter_mut() {
+            let mut old_states = HashMap::new();
+
+            for (i, cite) in res.iter_mut().enumerate() {
                 let style_ctx = cite.request.style();
-                for item in cite.items.iter_mut() {
+                for (j, item) in cite.items.iter_mut().enumerate() {
                     if let Some(state) = rerender.get(&(item.entry as _)) {
-                        item.cite_props.speculative.disambiguation = state.clone();
+                        let old_state = mem::replace(
+                            &mut item.cite_props.speculative.disambiguation,
+                            state.clone(),
+                        );
                         item.rendered = do_rerender(&style_ctx, item, cite.request);
+                        old_states.insert((i, j), old_state);
+                    }
+                }
+            }
+
+            let new_groups = find_ambiguous_sets(&res);
+            for (i, cite) in res.iter_mut().enumerate() {
+                let style_ctx = cite.request.style();
+                for (j, item) in cite.items.iter_mut().enumerate() {
+                    if let Some(DisambiguateState::NameDisambiguation(_)) =
+                        rerender.get(&(item.entry as _))
+                    {
+                        // Was rerendered
+                        if new_groups.iter().any(|g| g.contains(&(i, j))) {
+                            // Is still ambiguous; reset render
+                            let old_state = old_states.remove(&(i, j)).unwrap();
+                            item.cite_props.speculative.disambiguation = old_state;
+                            item.rendered = do_rerender(&style_ctx, item, cite.request);
+                        }
                     }
                 }
             }

@@ -1,0 +1,18 @@
+[package]
+name = "hayagriva-core"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+url = { workspace = true }
+thiserror = { workspace = true }
+citationberg = { workspace = true }
+unscanny = { workspace = true }
+roman-numerals-rs = "3.1.0"
+unicode-segmentation = { workspace = true }

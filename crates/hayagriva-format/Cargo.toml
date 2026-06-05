@@ -1,0 +1,22 @@
+[package]
+name = "hayagriva-format"
+description = "Archived CSL styles and locales for Hayagriva/Typst"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+
+[dependencies]
+citationberg = { workspace = true }
+indexmap = { workspace = true }
+paste = "1.0.14"
+serde = { workspace = true }
+unic-langid = { workspace = true }
+serde_yaml = "0.9.25"
+unicode-segmentation = { workspace = true }
+hayagriva-core = { path = "../hayagriva-core" }
+thiserror = { workspace = true }
+unscanny = { workspace = true }

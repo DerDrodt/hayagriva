@@ -1,0 +1,20 @@
+[package]
+name = "hayagriva-cli"
+description = "Archived CSL styles and locales for Hayagriva/Typst"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+
+[dependencies]
+citationberg = { workspace = true }
+clap = { version = "4", features = ["cargo"] }
+hayagriva-archive = { path = "../hayagriva-archive" }
+strum = { version = "0.26", features = ["derive"] }
+biblatex = { workspace = true, optional = true }
+
+[features]
+default = ["biblatex"]

@@ -12,6 +12,8 @@ use hayagriva_core::{
 };
 use unic_langid::LanguageIdentifier;
 
+use crate::citation_label::Alphanumerical;
+
 use super::Entry;
 
 impl EntryLike for Entry {

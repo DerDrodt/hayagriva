@@ -10,6 +10,7 @@ readme.workspace = true
 keywords.workspace = true
 
 [dependencies]
+biblatex = { workspace = true, optional = true }
 citationberg = { workspace = true }
 indexmap = { workspace = true }
 paste = "1.0.14"

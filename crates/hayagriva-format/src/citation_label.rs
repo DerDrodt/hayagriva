@@ -5,6 +5,8 @@ use unicode_segmentation::UnicodeSegmentation;
 
 use hayagriva_core::types::{EntryType, Person, PersonRole};
 
+use crate::Entry;
+
 /// Citation labels in the form of numbers.
 ///
 /// For example, the output could be Rass97 or MKG+21. \

@@ -22,6 +22,7 @@ use citationberg::{
 };
 use citationberg::{DateForm, LongShortForm, OrdinalLookup, TextCase};
 use hayagriva_core::lang::CaseFolder;
+use hayagriva_core::{ChunkKind, ChunkedString, Date, EntryLike, MaybeTyped, Person};
 use indexmap::IndexSet;
 
 use crate::elem::{NonEmptyStack, simplify_children};
@@ -33,9 +34,8 @@ use self::elem::last_text_mut_child;
 pub use self::elem::{
     BufWriteFormat, Elem, ElemChild, ElemChildren, ElemMeta, Formatted, Formatting,
 };
-use self::taxonomy::{EntryLike, NumberVariableResult, PageVariableResult};
+use self::taxonomy::{NumberVariableResult, PageVariableResult};
 
-mod citation_label;
 mod elem;
 mod rendering;
 mod sort;
@@ -3419,12 +3419,9 @@ mod tests {
     use std::{fs, path::Path};
 
     use citationberg::LocaleFile;
+    use hayagriva_core::{Numeric, NumericValue};
 
     use super::*;
-    use crate::{
-        io::from_yaml_str,
-        types::{Numeric, NumericValue},
-    };
 
     #[test]
     fn test_csl() {

@@ -7,7 +7,7 @@ use citationberg::{
     Display, FontStyle, FontVariant, FontWeight, TextDecoration, VerticalAlign,
 };
 
-use crate::types::Person;
+use hayagriva_core::Person;
 
 /// A container for elements with useful methods.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

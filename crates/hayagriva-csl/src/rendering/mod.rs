@@ -13,14 +13,15 @@ use citationberg::{
     ToFormatting,
 };
 use citationberg::{TermForm, TextTarget};
+use hayagriva_core::lang::{Case, SentenceCase, TitleCase};
+use hayagriva_core::{
+    ChunkedString, Date, EntryLike, MaybeTyped, Numeric, PageRanges, PageRangesPart,
+};
 
-use crate::PageRanges;
 use crate::Sorting;
-use crate::lang::{Case, SentenceCase, TitleCase};
 use crate::taxonomy::{NumberVariableResult, PageVariableResult};
-use crate::types::{ChunkedString, Date, MaybeTyped, Numeric};
 
-use super::taxonomy::{EntryLike, NumberOrPageVariableResult};
+use super::taxonomy::NumberOrPageVariableResult;
 use super::{Context, ElemMeta, IbidState, SpecialForm, UsageInfo, write_year};
 
 pub mod names;
@@ -460,12 +461,16 @@ fn render_page_range<T: EntryLike>(range: &PageRanges, ctx: &mut Context<T>) {
         .ranges
         .iter()
         .try_for_each(|r| match r {
-            crate::PageRangesPart::Ampersand => ctx.write_str(" & "),
-            crate::PageRangesPart::Comma => ctx.write_str(", "),
-            crate::PageRangesPart::EscapedRange(start, end) => PageRangeFormat::Expanded
-                .format(ctx, &start.to_string(), &end.to_string(), delim),
-            crate::PageRangesPart::SinglePage(page) => ctx.write_str(&page.to_string()),
-            crate::PageRangesPart::Range(start, end) => {
+            PageRangesPart::Ampersand => ctx.write_str(" & "),
+            PageRangesPart::Comma => ctx.write_str(", "),
+            PageRangesPart::EscapedRange(start, end) => PageRangeFormat::Expanded.format(
+                ctx,
+                &start.to_string(),
+                &end.to_string(),
+                delim,
+            ),
+            PageRangesPart::SinglePage(page) => ctx.write_str(&page.to_string()),
+            PageRangesPart::Range(start, end) => {
                 format.format(ctx, &start.to_string(), &end.to_string(), delim)
             }
         })
@@ -1446,19 +1451,6 @@ impl RenderCsl for citationberg::RenderingElement {
         match self {
             citationberg::RenderingElement::Layout(l) => l.will_have_info(ctx),
             citationberg::RenderingElement::Other(o) => o.will_have_info(ctx),
-        }
-    }
-}
-
-impl From<TextCase> for Case {
-    fn from(case: TextCase) -> Self {
-        match case {
-            TextCase::Uppercase => Case::Uppercase,
-            TextCase::Lowercase => Case::Lowercase,
-            TextCase::TitleCase => Case::Title(TitleCase::default()),
-            TextCase::SentenceCase => Case::Sentence(SentenceCase::default()),
-            TextCase::CapitalizeFirst => Case::FirstUpper,
-            TextCase::CapitalizeAll => Case::AllUpper,
         }
     }
 }

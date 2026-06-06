@@ -29,17 +29,17 @@ use std::{
 
 extern crate hayagriva_util;
 use hayagriva_util::test_util::{
-    ensure_repo, iter_files, iter_files_with_name, CACHE_PATH,
+    CACHE_PATH, ensure_repo, iter_files, iter_files_with_name,
 };
 
 const STYLES_REPO_NAME: &str = "styles";
 const CSL_REPO: &str = "https://github.com/citation-style-language/styles";
 const LOCALES_REPO: &str = "https://github.com/citation-style-language/locales";
 const LOCALES_REPO_NAME: &str = "locales";
-const OWN_STYLES: &str = "styles";
-const ARCHIVE_STYLES_PATH: &str = "archive/styles/";
-const ARCHIVE_LOCALES_PATH: &str = "archive/locales/";
-const ARCHIVE_SRC_PATH: &str = "crates/hayagriva-archive/lib.rs";
+const OWN_STYLES: &str = "../../styles";
+const ARCHIVE_STYLES_PATH: &str = "../../archive/styles/";
+const ARCHIVE_LOCALES_PATH: &str = "../../archive/locales/";
+const ARCHIVE_SRC_PATH: &str = "src/lib.rs";
 
 const UPDATE_ARCHIVES_ENV_VAR: &str = "HAYAGRIVA_ARCHIVER_UPDATE";
 
@@ -320,7 +320,7 @@ fn write_styles_section(
 
         writeln!(
             w,
-            "            Self::{variant} => include_bytes!(\"../../archive/styles/{stripped_id}.cbor\"),"
+            "            Self::{variant} => include_bytes!(\"../../../archive/styles/{stripped_id}.cbor\"),"
         )?;
     }
     writeln!(w, "        }}")?;
@@ -384,7 +384,7 @@ fn write_locales_section(w: &mut String, items: &[(Vec<u8>, Locale)]) -> fmt::Re
     for (_, locale) in items {
         writeln!(
             w,
-            "    include_bytes!(\"../../archive/locales/{}.cbor\"),",
+            "    include_bytes!(\"../../../archive/locales/{}.cbor\"),",
             locale.lang.as_ref().unwrap()
         )?;
     }

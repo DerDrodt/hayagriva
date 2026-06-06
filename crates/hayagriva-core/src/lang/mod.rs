@@ -5,6 +5,8 @@ pub(crate) mod name;
 
 use std::{fmt::Write, mem};
 
+use citationberg::TextCase;
+
 use crate::types::{FoldableKind, FoldableStringChunk};
 
 /// Rules for the title case transformation.
@@ -132,6 +134,19 @@ impl Case {
 impl From<TitleCase> for Case {
     fn from(props: TitleCase) -> Self {
         Self::Title(props)
+    }
+}
+
+impl From<TextCase> for Case {
+    fn from(case: TextCase) -> Self {
+        match case {
+            TextCase::Uppercase => Case::Uppercase,
+            TextCase::Lowercase => Case::Lowercase,
+            TextCase::TitleCase => Case::Title(TitleCase::default()),
+            TextCase::SentenceCase => Case::Sentence(SentenceCase::default()),
+            TextCase::CapitalizeFirst => Case::FirstUpper,
+            TextCase::CapitalizeAll => Case::AllUpper,
+        }
     }
 }
 
@@ -653,7 +668,7 @@ impl CaseFolder {
 
     /// Yield the buffer as a mutable string. Must call [`Self::mark_changed`]
     /// if the length of the string is changed.
-    pub(crate) fn as_string_mut(&mut self) -> &mut String {
+    pub fn as_string_mut(&mut self) -> &mut String {
         &mut self.buf
     }
 

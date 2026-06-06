@@ -216,6 +216,10 @@ dependencies = [
  "citationberg",
  "clap",
  "hayagriva-archive",
+ "hayagriva-biblatex",
+ "hayagriva-core",
+ "hayagriva-csl",
+ "hayagriva-format",
  "strum 0.26.3",
 ]
 
@@ -248,6 +252,7 @@ dependencies = [
 name = "hayagriva-format"
 version = "0.10.0"
 dependencies = [
+ "biblatex",
  "citationberg",
  "hayagriva-core",
  "indexmap",

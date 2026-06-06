@@ -12,12 +12,12 @@ use clap::builder::PossibleValue;
 use clap::{Arg, ArgAction, Command, ValueEnum, crate_version};
 use strum::VariantNames;
 
-use hayagriva::{
-    BibliographyDriver, CitationItem, CitationRequest, LocatorPayload, SpecificLocator,
-    io,
-};
-use hayagriva::{BibliographyRequest, Selector};
 use hayagriva_archive::{ArchivedStyle, locales};
+use hayagriva_csl::{
+    BibliographyDriver, BibliographyRequest, CitationItem, CitationRequest,
+    LocatorPayload, SpecificLocator,
+};
+use hayagriva_format::{Selector, io};
 
 #[derive(Debug, Copy, Clone, PartialEq, VariantNames)]
 #[strum(serialize_all = "kebab_case")]

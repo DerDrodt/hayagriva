@@ -1,0 +1,22 @@
+[package]
+name = "tests"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+publish = false
+
+[dev-dependencies]
+citationberg = { workspace = true, features = ["json"] }
+hayagriva-archive = { path = "../hayagriva-archive" }
+hayagriva-csl = { path = "../hayagriva-csl" }
+hayagriva-format = { path = "../hayagriva-format" }
+hayagriva-util = { path = "../hayagriva-util" }
+unscanny = { workspace = true }
+
+[[test]]
+name = "citeproc"
+path = "tests/citeproc.rs"

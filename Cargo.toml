@@ -7,7 +7,7 @@ members = [
   "crates/hayagriva-csl",
   "crates/hayagriva-format",
   "crates/hayagriva-json",
-  "crates/hayagriva-util",
+  "crates/hayagriva-util", "crates/tests",
 ]
 resolver = "2"
 

@@ -709,6 +709,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tests"
+version = "0.10.0"
+dependencies = [
+ "citationberg",
+ "hayagriva-archive",
+ "hayagriva-csl",
+ "hayagriva-format",
+ "hayagriva-util",
+ "unscanny",
+]
+
+[[package]]
 name = "thiserror"
 version = "2.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"

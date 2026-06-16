@@ -142,6 +142,7 @@ return `Some` even if no sub-entry was bound / if the hash map is empty.
 mod selectors;
 
 pub mod citation_label;
+mod interop;
 pub mod io;
 pub mod taxonomy;
 

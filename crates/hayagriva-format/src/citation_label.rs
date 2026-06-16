@@ -78,6 +78,7 @@ impl Alphanumerical {
         })
     }
 
+    /// Renders a citation of `entry`
     pub fn citation(self, entry: &Entry) -> String {
         let full_entry = entry.get_full();
 

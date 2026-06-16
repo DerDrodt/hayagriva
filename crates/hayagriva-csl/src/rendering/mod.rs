@@ -9,11 +9,9 @@ use citationberg::taxonomy::{
 use citationberg::{
     ChooseBranch, CslMacro, DateDayForm, DateMonthForm, DatePartName, DateParts,
     DateStrongAnyForm, GrammarGender, LabelPluralize, LayoutRenderingElement,
-    LongShortForm, NumberForm, PageRangeFormat, TestPosition, TextCase, ToAffixes,
-    ToFormatting,
+    LongShortForm, NumberForm, PageRangeFormat, TestPosition, ToAffixes, ToFormatting,
 };
 use citationberg::{TermForm, TextTarget};
-use hayagriva_core::lang::{Case, SentenceCase, TitleCase};
 use hayagriva_core::{
     ChunkedString, Date, EntryLike, MaybeTyped, Numeric, PageRanges, PageRangesPart,
 };

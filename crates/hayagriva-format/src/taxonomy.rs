@@ -1,3 +1,5 @@
+//! Translation from Hayagriva to CSL variables
+
 use std::{borrow::Cow, str::FromStr};
 
 use citationberg::{

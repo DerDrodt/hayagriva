@@ -11,7 +11,7 @@ use tex::{
 use url::Url;
 
 use super::Entry;
-use super::types::*;
+use hayagriva_core::types::*;
 
 macro_rules! tex_kinds {
     ($self:expr, $mv_attr:expr, [$({$kind:pat, $new_kind:expr, $top_level:expr, $expand_mv:expr}),* $(,)*] $(,)*) => {
@@ -39,78 +39,70 @@ macro_rules! tex_kinds {
     };
 }
 
-impl From<&tex::Person> for Person {
-    fn from(person: &tex::Person) -> Self {
-        fn optional(part: &str) -> Option<String> {
-            if !part.is_empty() { Some(part.to_string()) } else { None }
+fn person(person: &tex::Person) -> Person {
+    fn optional(part: &str) -> Option<String> {
+        if !part.is_empty() { Some(part.to_string()) } else { None }
+    }
+
+    Person {
+        name: person.name.clone(),
+        given_name: optional(&person.given_name),
+        prefix: optional(&person.prefix),
+        suffix: optional(&person.suffix),
+        comma_suffix: false,
+        alias: None,
+    }
+}
+
+fn date(date: tex::Date) -> Date {
+    let approximate = date.uncertain || date.approximate;
+
+    match date.value {
+        DateValue::At(x) | DateValue::After(x) | DateValue::Before(x) => Date {
+            year: x.year,
+            month: x.month,
+            day: x.day,
+            approximate,
+            season: None,
+        },
+        DateValue::Between(_, x) => Date {
+            year: x.year,
+            month: x.month,
+            day: x.day,
+            approximate,
+            season: None,
+        },
+    }
+}
+
+fn chunks_to_chunked_str(chunks: &[Spanned<Chunk>]) -> ChunkedString {
+    let mut res = ChunkedString::new();
+    for chunk in chunks {
+        match &chunk.v {
+            Chunk::Normal(s) => res.push_str(s, ChunkKind::Normal),
+            Chunk::Verbatim(s) => res.push_str(s, ChunkKind::Verbatim),
+            Chunk::Math(s) => res.push_str(s, ChunkKind::Math),
         }
-
-        Self {
-            name: person.name.clone(),
-            given_name: optional(&person.given_name),
-            prefix: optional(&person.prefix),
-            suffix: optional(&person.suffix),
-            comma_suffix: false,
-            alias: None,
-        }
     }
+    res
 }
 
-impl From<tex::Date> for Date {
-    fn from(date: tex::Date) -> Self {
-        let approximate = date.uncertain || date.approximate;
-
-        match date.value {
-            DateValue::At(x) | DateValue::After(x) | DateValue::Before(x) => Date {
-                year: x.year,
-                month: x.month,
-                day: x.day,
-                approximate,
-                season: None,
-            },
-            DateValue::Between(_, x) => Self {
-                year: x.year,
-                month: x.month,
-                day: x.day,
-                approximate,
-                season: None,
-            },
-        }
-    }
+fn chunks_to_fmt_str(chunks: &[Spanned<Chunk>]) -> FormatString {
+    FormatString { value: chunks_to_chunked_str(chunks), short: None }
 }
 
-impl From<&[Spanned<Chunk>]> for ChunkedString {
-    fn from(chunks: &[Spanned<Chunk>]) -> Self {
-        let mut res = Self::new();
-        for chunk in chunks {
-            match &chunk.v {
-                Chunk::Normal(s) => res.push_str(s, ChunkKind::Normal),
-                Chunk::Verbatim(s) => res.push_str(s, ChunkKind::Verbatim),
-                Chunk::Math(s) => res.push_str(s, ChunkKind::Math),
-            }
-        }
-        res
-    }
+fn chunks_to_mby_numeric(chunks: &[Spanned<Chunk>]) -> MaybeTyped<Numeric> {
+    let verb = chunks.format_verbatim();
+    MaybeTyped::infallible_from_str(&verb)
 }
 
-impl From<&[Spanned<Chunk>]> for FormatString {
-    fn from(chunks: &[Spanned<Chunk>]) -> Self {
-        Self { value: chunks.into(), short: None }
-    }
-}
-
-impl From<&[Spanned<Chunk>]> for MaybeTyped<Numeric> {
-    fn from(chunks: &[Spanned<Chunk>]) -> Self {
-        let verb = chunks.format_verbatim();
-        MaybeTyped::infallible_from_str(&verb)
-    }
-}
-
-impl From<&PermissiveType<i64>> for MaybeTyped<Numeric> {
-    fn from(edition_or_volume: &PermissiveType<i64>) -> Self {
-        match edition_or_volume {
-            PermissiveType::Typed(i) => Self::Typed(Numeric::new(*i as i32)),
-            PermissiveType::Chunks(c) => Self::infallible_from_str(&c.format_verbatim()),
+fn permissive_to_mby_numeric(
+    edition_or_volume: &PermissiveType<i64>,
+) -> MaybeTyped<Numeric> {
+    match edition_or_volume {
+        PermissiveType::Typed(i) => MaybeTyped::Typed(Numeric::new(*i as i32)),
+        PermissiveType::Chunks(c) => {
+            MaybeTyped::infallible_from_str(&c.format_verbatim())
         }
     }
 }
@@ -216,7 +208,7 @@ impl TryFrom<&tex::Entry> for Entry {
             { tex::EntryType::Unknown(_), EntryType::Misc, None, false },
         ]);
 
-        if let Ok(a) = entry.author().map(|a| a.iter().map(Into::into).collect()) {
+        if let Ok(a) = entry.author().map(|a| a.iter().map(person).collect()) {
             item.set_authors(a);
         }
 
@@ -225,9 +217,9 @@ impl TryFrom<&tex::Entry> for Entry {
         for (editors, role) in entry.editors()? {
             let ptype = ed_role(role, &entry.entry_type);
             match ptype {
-                None => eds.extend(editors.iter().map(Into::into)),
+                None => eds.extend(editors.iter().map(person)),
                 Some(role) => collaborators.push(PersonsWithRoles::new(
-                    editors.iter().map(Into::into).collect(),
+                    editors.iter().map(person).collect(),
                     role,
                 )),
             }
@@ -240,33 +232,32 @@ impl TryFrom<&tex::Entry> for Entry {
             item.set_affiliated(collaborators);
         }
 
-        if let Some(a) =
-            map_res(entry.holder())?.map(|a| a.iter().map(Into::into).collect())
+        if let Some(a) = map_res(entry.holder())?.map(|a| a.iter().map(person).collect())
         {
             item.add_affiliated_persons((a, PersonRole::Holder));
         }
 
         if let Some(parent) = book(&mut item, parent)
             && let Some(a) =
-                map_res(entry.book_author())?.map(|a| a.iter().map(Into::into).collect())
+                map_res(entry.book_author())?.map(|a| a.iter().map(person).collect())
         {
             parent.set_authors(a);
         }
 
         if let Some(a) =
-            map_res(entry.annotator())?.map(|a| a.iter().map(Into::into).collect())
+            map_res(entry.annotator())?.map(|a| a.iter().map(person).collect())
         {
             item.add_affiliated_persons((a, PersonRole::Annotator));
         }
 
         if let Some(a) =
-            map_res(entry.commentator())?.map(|a| a.iter().map(Into::into).collect())
+            map_res(entry.commentator())?.map(|a| a.iter().map(person).collect())
         {
             item.add_affiliated_persons((a, PersonRole::Commentator));
         }
 
         if let Some(a) =
-            map_res(entry.translator())?.map(|a| a.iter().map(Into::into).collect())
+            map_res(entry.translator())?.map(|a| a.iter().map(person).collect())
         {
             item.add_affiliated_persons((a, PersonRole::Translator));
         }
@@ -291,25 +282,27 @@ impl TryFrom<&tex::Entry> for Entry {
         }
 
         if let Some(a) =
-            map_res(entry.afterword())?.map(|a| a.iter().map(Into::into).collect())
+            map_res(entry.afterword())?.map(|a| a.iter().map(person).collect())
         {
             item.add_affiliated_persons((a, PersonRole::Afterword));
         }
 
         if let Some(a) =
-            map_res(entry.foreword())?.map(|a| a.iter().map(Into::into).collect())
+            map_res(entry.foreword())?.map(|a| a.iter().map(person).collect())
         {
             item.add_affiliated_persons((a, PersonRole::Foreword));
         }
 
         if let Some(a) =
-            map_res(entry.introduction())?.map(|a| a.iter().map(Into::into).collect())
+            map_res(entry.introduction())?.map(|a| a.iter().map(person).collect())
         {
             item.add_affiliated_persons((a, PersonRole::Introduction));
         }
 
-        if let Some(title) = map_res(entry.title())?.map(Into::into) {
-            if let Some(short_title) = map_res(entry.short_title())?.map(Into::into) {
+        if let Some(title) = map_res(entry.title())?.map(chunks_to_chunked_str) {
+            if let Some(short_title) =
+                map_res(entry.short_title())?.map(chunks_to_chunked_str)
+            {
                 item.set_title(FormatString {
                     value: title,
                     short: Some(Box::new(short_title)),
@@ -322,17 +315,21 @@ impl TryFrom<&tex::Entry> for Entry {
         // NOTE: Ignoring subtitle and titleaddon for now
 
         if let Some(parent) = mv(&mut item, parent, mv_parent)
-            && let Some(title) = map_res(entry.main_title())?.map(Into::into)
+            && let Some(title) = map_res(entry.main_title())?.map(chunks_to_fmt_str)
         {
             parent.set_title(title);
         }
 
         if let Some(parent) = book(&mut item, parent) {
             if entry.entry_type == tex::EntryType::Article {
-                if let Some(title) = map_res(entry.journal_title())?.map(Into::into) {
+                if let Some(title) =
+                    map_res(entry.journal_title())?.map(chunks_to_fmt_str)
+                {
                     parent.set_title(title);
                 }
-            } else if let Some(title) = map_res(entry.book_title())?.map(Into::into) {
+            } else if let Some(title) =
+                map_res(entry.book_title())?.map(chunks_to_fmt_str)
+            {
                 parent.set_title(title);
             }
         }
@@ -353,14 +350,14 @@ impl TryFrom<&tex::Entry> for Entry {
                     PermissiveType::Typed(d) => Some(d),
                     PermissiveType::Chunks(_) => None,
                 })
-                .map(|d| d.into())
+                .map(date)
             {
                 conference.set_date(event_date);
             }
-            if let Some(title) = map_res(entry.eventtitle())?.map(Into::into) {
+            if let Some(title) = map_res(entry.eventtitle())?.map(chunks_to_fmt_str) {
                 conference.set_title(title);
             }
-            if let Some(venue) = map_res(entry.venue())?.map(|d| d.into()) {
+            if let Some(venue) = map_res(entry.venue())?.map(chunks_to_fmt_str) {
                 conference.set_location(venue);
             }
 
@@ -372,12 +369,14 @@ impl TryFrom<&tex::Entry> for Entry {
                 PermissiveType::Typed(d) => Some(d),
                 PermissiveType::Chunks(_) => None,
             })
-            .map(|d| d.into())
+            .map(date)
         {
             item.set_date(date);
         }
 
-        if let Some(edition) = map_res(entry.edition())?.map(|d| (&d).into()) {
+        if let Some(edition) =
+            map_res(entry.edition())?.map(|d| permissive_to_mby_numeric(&d))
+        {
             if let Some(parent) = book(&mut item, parent) {
                 parent.set_edition(edition);
             } else {
@@ -389,14 +388,14 @@ impl TryFrom<&tex::Entry> for Entry {
             entry.entry_type,
             tex::EntryType::Article | tex::EntryType::Proceedings
         ) {
-            if let Some(issue) = map_res(entry.issue())?.map(|d| d.into()) {
+            if let Some(issue) = map_res(entry.issue())?.map(chunks_to_mby_numeric) {
                 if let Some(parent) = book(&mut item, parent) {
                     parent.set_issue(issue);
                 } else {
                     item.set_issue(issue);
                 }
             }
-            if let Some(ititle) = map_res(entry.issue_title())?.map(Into::into) {
+            if let Some(ititle) = map_res(entry.issue_title())?.map(chunks_to_fmt_str) {
                 if let Some(parent) = book(&mut item, parent) {
                     parent.set_title(ititle);
                 } else {
@@ -412,7 +411,7 @@ impl TryFrom<&tex::Entry> for Entry {
         // report, manual, and dataset, where it fits the use for patent.
         // Hayagriva uses "issue" for the journal/book sense of biblatex's number,
         // and "serial-number" for the record number / token sense.
-        if let Some(number) = map_res(entry.number())?.map(|d| d.into()) {
+        if let Some(number) = map_res(entry.number())?.map(chunks_to_mby_numeric) {
             if let Some(parent) = book(&mut item, parent) {
                 parent.set_issue(number);
             } else {
@@ -429,7 +428,7 @@ impl TryFrom<&tex::Entry> for Entry {
         }
 
         if let Some(volume) = map_res(entry.volume())? {
-            let val = (&volume).into();
+            let val = permissive_to_mby_numeric(&volume);
             if let Some(parent) = book(&mut item, parent) {
                 parent.set_volume(val);
             } else {
@@ -488,21 +487,21 @@ impl TryFrom<&tex::Entry> for Entry {
                     PermissiveType::Typed(d) => Some(d),
                     PermissiveType::Chunks(_) => None,
                 })
-                .map(|d| d.into());
+                .map(date);
             item.set_url(QualifiedUrl { value: url, visit_date: date });
         }
 
         if let Some(publisher_name) =
             map_res(entry.publisher())?.map(|pubs| comma_list(&pubs))
         {
-            let location = map_res(entry.location())?.map(|d| d.into());
+            let location = map_res(entry.location())?.map(chunks_to_fmt_str);
             let publisher = Publisher::new(Some(publisher_name), location);
             if let Some(parent) = book(&mut item, parent) {
                 parent.set_publisher(publisher);
             } else {
                 item.set_publisher(publisher);
             }
-        } else if let Some(location) = map_res(entry.location())?.map(|d| d.into()) {
+        } else if let Some(location) = map_res(entry.location())?.map(chunks_to_fmt_str) {
             let publisher = Publisher::new(None, Some(location));
             if let Some(parent) = book(&mut item, parent) {
                 parent.set_publisher(publisher);
@@ -519,7 +518,9 @@ impl TryFrom<&tex::Entry> for Entry {
             } else {
                 item.set_organization(organization);
             }
-        } else if let Some(organization) = map_res(entry.institution())?.map(Into::into) {
+        } else if let Some(organization) =
+            map_res(entry.institution())?.map(chunks_to_fmt_str)
+        {
             if let Some(parent) = book(&mut item, parent) {
                 parent.set_organization(organization);
             } else {
@@ -527,7 +528,7 @@ impl TryFrom<&tex::Entry> for Entry {
             }
         }
 
-        if let Some(note) = map_res(entry.how_published())?.map(Into::into) {
+        if let Some(note) = map_res(entry.how_published())?.map(chunks_to_fmt_str) {
             if let Some(parent) = book(&mut item, parent) {
                 parent.set_note(note);
             } else {
@@ -568,20 +569,20 @@ impl TryFrom<&tex::Entry> for Entry {
             }
         }
 
-        if let Some(note) = map_res(entry.note())?.map(Into::into) {
+        if let Some(note) = map_res(entry.note())?.map(chunks_to_fmt_str) {
             item.set_note(note);
         }
 
         if let Some(note) = map_res(entry.annotation())?
             .or_else(|| entry.addendum().ok())
-            .map(Into::into)
+            .map(chunks_to_fmt_str)
             && item.note.is_none()
         {
             item.set_note(note);
         }
 
         if let Some(abstract_) = map_res(entry.abstract_())? {
-            item.set_abstract_(abstract_.into())
+            item.set_abstract_(chunks_to_fmt_str(abstract_))
         }
 
         // BibLaTeX describes "type" as "The type of a manual, patent, report, or thesis.
@@ -610,7 +611,7 @@ impl TryFrom<&tex::Entry> for Entry {
         }
 
         if let Some(series) = map_res(entry.series())? {
-            let title: FormatString = series.into();
+            let title: FormatString = chunks_to_fmt_str(series);
             let mut new = Entry::new(&entry.key, item.entry_type);
             new.set_title(title);
 
@@ -635,7 +636,7 @@ impl TryFrom<&tex::Entry> for Entry {
             // is better corresponded to by the `@InBook` BibLaTeX entry type:
             // "A part of a book which forms a self-contained unit with its
             // own title."
-            item.set_chapter(chapter.into());
+            item.set_chapter(chunks_to_mby_numeric(chapter));
         }
 
         Ok(item)
@@ -649,7 +650,7 @@ fn comma_list(items: &[Vec<Spanned<Chunk>>]) -> FormatString {
             value.push_str(", ", ChunkKind::Normal);
         }
 
-        let chunked = ChunkedString::from(entity.as_slice());
+        let chunked = chunks_to_chunked_str(entity.as_slice());
         value.extend(chunked);
     }
 
@@ -660,7 +661,7 @@ fn comma_list(items: &[Vec<Spanned<Chunk>>]) -> FormatString {
 mod tests {
     use unic_langid::LanguageIdentifier;
 
-    use crate::types::{EntryType, MaybeTyped, PersonRole};
+    use hayagriva_core::types::{EntryType, MaybeTyped, PersonRole};
 
     #[test]
     fn test_pmid_from_biblatex() {

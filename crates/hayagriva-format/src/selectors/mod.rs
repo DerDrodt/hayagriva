@@ -39,7 +39,7 @@
 /// ```
 ///
 /// [intro]: https://github.com/typst/hayagriva/blob/main/docs/selectors.md
-/// [EType]: crate::types::EntryType
+/// [EType]: hayagriva_core::types::EntryType
 #[macro_export]
 macro_rules! select {
     (($($tts:tt)*)) => {

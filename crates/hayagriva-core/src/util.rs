@@ -82,7 +82,7 @@ where
 /// This is a wrapper for [`OneOrMany`] that assumes that the single
 /// representation isn't a sequence. This allows better error messages.
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct MapOneOrMany<T>(OneOrMany<T>);
+pub struct MapOneOrMany<T>(OneOrMany<T>);
 
 impl<T> From<MapOneOrMany<T>> for OneOrMany<T> {
     fn from(from: MapOneOrMany<T>) -> Self {

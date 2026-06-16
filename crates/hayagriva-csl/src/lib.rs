@@ -2008,7 +2008,7 @@ impl<'a> BibliographyRequest<'a> {
     }
 }
 
-/// A reference to an [`crate::Entry`] within a [`CitationRequest`].
+/// A reference to an [`EntryLike`] within a [`CitationRequest`].
 #[derive(Debug, Clone, PartialEq)]
 pub struct CitationItem<'a, T: EntryLike> {
     /// The entry to format.

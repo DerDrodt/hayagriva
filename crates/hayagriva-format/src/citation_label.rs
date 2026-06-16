@@ -25,7 +25,7 @@ impl Default for Alphanumerical {
 }
 
 impl Alphanumerical {
-    /// Create a new instance of this [`CitationStyle`].
+    /// Create a new instance of this citation style.
     pub fn new() -> Self {
         Self { letters: 3 }
     }

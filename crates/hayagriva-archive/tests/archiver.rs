@@ -65,6 +65,18 @@ fn no_dupe_id() {
     assert_eq!(set.len(), STYLE_IDS.len());
 }
 
+#[test]
+fn ids_are_sorted() {
+    for window in STYLE_IDS.windows(2) {
+        assert!(
+            window[0] < window[1],
+            "STYLE_IDS is not sorted: {:?} should come after {:?}",
+            window[0],
+            window[1]
+        );
+    }
+}
+
 /// Download the CSL styles and locales repos.
 fn ensure_repos() -> Result<(), ArchivalError> {
     ensure_repo(CSL_REPO, STYLES_REPO_NAME, "master")?;
@@ -522,13 +534,15 @@ impl fmt::Display for ArchivalError {
 }
 
 /// IDs of CSL styles requested for archive inclusion.
-const STYLE_IDS: [&str; 80] = [
+const STYLE_IDS: [&str; 82] = [
     "http://typst.org/csl/alphanumeric",
     "http://www.zotero.org/styles/american-anthropological-association",
     "http://www.zotero.org/styles/american-chemical-society",
     "http://www.zotero.org/styles/american-geophysical-union",
     "http://www.zotero.org/styles/american-institute-of-aeronautics-and-astronautics",
     "http://www.zotero.org/styles/american-institute-of-physics",
+    "http://www.zotero.org/styles/american-mathematical-society-label",
+    "http://www.zotero.org/styles/american-mathematical-society-numeric",
     "http://www.zotero.org/styles/american-medical-association",
     "http://www.zotero.org/styles/american-meteorological-society",
     "http://www.zotero.org/styles/american-physics-society",

@@ -21,8 +21,8 @@
 /// This example illustrates some of the differences:
 ///
 /// ```rust
-/// use hayagriva::select;
-/// use hayagriva::Selector;
+/// use hayagriva_format::select;
+/// use hayagriva_format::Selector;
 ///
 /// // finds an article that is parented by a conference proceedings volume
 /// assert_eq!(Selector::parse("article > proceedings").unwrap(), select!(Article > Proceedings));

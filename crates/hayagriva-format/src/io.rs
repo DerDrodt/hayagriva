@@ -10,7 +10,7 @@ use crate::Library;
 /// Parse a bibliography from a YAML string.
 ///
 /// ```
-/// use hayagriva::io::from_yaml_str;
+/// use hayagriva_format::io::from_yaml_str;
 ///
 /// let yaml = r#"
 /// crazy-rich:
@@ -90,7 +90,7 @@ mod tests {
 
     #[test]
     fn roundtrip() {
-        let contents = fs::read_to_string("tests/data/basic.yml").unwrap();
+        let contents = fs::read_to_string("../../tests/data/basic.yml").unwrap();
         let entries = from_yaml_str(&contents).unwrap();
         let yaml = to_yaml_str(&entries).unwrap();
         println!("{}", &yaml);

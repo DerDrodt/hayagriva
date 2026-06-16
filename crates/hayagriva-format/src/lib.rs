@@ -797,7 +797,7 @@ mod tests {
 
     #[test]
     fn selectors() {
-        let contents = fs::read_to_string("tests/data/basic.yml").unwrap();
+        let contents = fs::read_to_string("../../tests/data/basic.yml").unwrap();
         let entries = from_yaml_str(&contents).unwrap();
 
         select_all!("article > proceedings", entries, ["zygos"]);
@@ -865,7 +865,7 @@ mod tests {
 
     #[test]
     fn selector_bindings() {
-        let contents = fs::read_to_string("tests/data/basic.yml").unwrap();
+        let contents = fs::read_to_string("../../tests/data/basic.yml").unwrap();
         let entries = from_yaml_str(&contents).unwrap();
 
         select!(

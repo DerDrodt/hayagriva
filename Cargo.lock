@@ -204,7 +204,7 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
 name = "hayagriva-archive"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "ciborium",
  "citationberg",
@@ -215,11 +215,11 @@ dependencies = [
 
 [[package]]
 name = "hayagriva-biblatex"
-version = "0.10.0"
+version = "0.10.1"
 
 [[package]]
 name = "hayagriva-cli"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "biblatex",
  "citationberg",
@@ -234,7 +234,7 @@ dependencies = [
 
 [[package]]
 name = "hayagriva-core"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "citationberg",
  "roman-numerals-rs",
@@ -247,7 +247,7 @@ dependencies = [
 
 [[package]]
 name = "hayagriva-csl"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "citationberg",
  "hayagriva-core",
@@ -259,7 +259,7 @@ dependencies = [
 
 [[package]]
 name = "hayagriva-format"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "biblatex",
  "citationberg",
@@ -279,7 +279,7 @@ dependencies = [
 
 [[package]]
 name = "hayagriva-json"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "citationberg",
  "hayagriva-core",
@@ -288,7 +288,7 @@ dependencies = [
 
 [[package]]
 name = "hayagriva-util"
-version = "0.10.0"
+version = "0.10.1"
 
 [[package]]
 name = "heck"
@@ -749,7 +749,7 @@ dependencies = [
 
 [[package]]
 name = "tests"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "citationberg",
  "hayagriva-archive",

@@ -7,12 +7,13 @@ members = [
   "crates/hayagriva-csl",
   "crates/hayagriva-format",
   "crates/hayagriva-json",
-  "crates/hayagriva-util", "crates/tests",
+  "crates/hayagriva-util",
+  "crates/tests",
 ]
 resolver = "2"
 
 [workspace.package]
-version = "0.10.0"
+version = "0.10.1"
 authors = [
   "Martin Haug <mhaug@live.de>",
   "Daniel Drodt <daniel.drodt@tu-darmstadt.de>",

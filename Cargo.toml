@@ -34,8 +34,3 @@ unicode-segmentation = "1.6.0"
 thiserror = "2.0.16"
 unscanny = "0.1.0"
 url = { version = "2.4", features = ["serde"] }
-
-[workspace.dev-dependencies]
-heck = "0.5"
-serde_json = "1"
-regex = "1"

@@ -3416,11 +3416,6 @@ fn get_last_text(child: &mut ElemChild) -> Option<&mut String> {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs, path::Path};
-
-    use citationberg::LocaleFile;
-    use hayagriva_core::{Numeric, NumericValue};
-
     use super::*;
 
     #[test]

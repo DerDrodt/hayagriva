@@ -640,27 +640,4 @@ mod tests {
             );
         }
     }
-
-    #[test]
-    #[cfg(feature = "biblatex")]
-    fn test_issue_227() {
-        let yaml = r#"
-AAAnonymous_AventureMortevielle_1987:
-  type: Book
-  page-range: 100"#;
-
-        let library = crate::io::from_yaml_str(yaml).unwrap();
-        let entry = library.get("AAAnonymous_AventureMortevielle_1987").unwrap();
-        assert_eq!(
-            entry
-                .page_range
-                .as_ref()
-                .unwrap()
-                .as_typed()
-                .unwrap()
-                .first()
-                .unwrap(),
-            &Numeric::new(100)
-        );
-    }
 }

@@ -222,7 +222,7 @@ struct TestCase {
     mode: TestMode,
     result: String,
     csl: Style,
-    input: Vec<csl_json::Item>,
+    input: Vec<hayagriva_json::Item>,
     bib_entries: Option<Vec<Vec<String>>>,
     bib_section: Option<String>,
     citation_items: Option<Vec<Vec<csl_json::CitationItem>>>,
@@ -494,7 +494,7 @@ where
     let contains_date_ranges = case
         .input
         .iter()
-        .flat_map(|i| i.0.values())
+        .flat_map(|i| i.0.0.values())
         .filter_map(|v| if let csl_json::Value::Date(d) = v { Some(d) } else { None })
         .any(|d| {
             csl_json::FixedDateRange::try_from(d.clone()).is_ok_and(|d| d.end.is_some())
@@ -518,7 +518,7 @@ where
             eprintln!("Skipping test {}\t(cause: date ranges)", display());
         }
         false
-    } else if case.input.iter().any(|i| i.has_html() || i.may_have_hack()) {
+    } else if case.input.iter().any(|i| i.0.has_html() || i.0.may_have_hack()) {
         if print {
             eprintln!("Skipping test {}\t(cause: HTML suspected in input)", display());
         }
@@ -537,7 +537,8 @@ where
         panic!("test {} has dependent style", display());
     };
 
-    let mut driver: BibliographyDriver<'_, csl_json::Item> = BibliographyDriver::new();
+    let mut driver: BibliographyDriver<'_, hayagriva_json::Item> =
+        BibliographyDriver::new();
     let mut output = String::new();
     if let Some(cites) = &case.citation_items {
         for cite in cites {
@@ -547,7 +548,7 @@ where
                         CitationItem::new(
                             case.input
                                 .iter()
-                                .find(|e| e.id().unwrap_or_default() == i.id.as_str())
+                                .find(|e| e.0.id().unwrap_or_default() == i.id.as_str())
                                 .unwrap(),
                             i.locator.as_deref().map(|lo| {
                                 SpecificLocator(
@@ -561,7 +562,7 @@ where
                             None,
                             false,
                             if i.suppress_author {
-                                Some(hayagriva::CitePurpose::Author)
+                                Some(hayagriva_csl::CitePurpose::Author)
                             } else {
                                 None
                             },
@@ -591,7 +592,7 @@ where
             for citation in rendered.citations {
                 citation
                     .citation
-                    .write_buf(&mut output, hayagriva::BufWriteFormat::Plain)
+                    .write_buf(&mut output, hayagriva_csl::BufWriteFormat::Plain)
                     .unwrap();
                 output.push('\n');
             }
@@ -641,10 +642,10 @@ mod citeproc_bib {
     use citationberg::{
         Display, FontStyle, FontVariant, FontWeight, TextDecoration, VerticalAlign,
     };
-    use hayagriva::{BufWriteFormat, Elem, ElemChild, Formatting};
+    use hayagriva_csl::{BufWriteFormat, Elem, ElemChild, Formatting};
 
     pub(super) fn render(
-        bib: &hayagriva::RenderedBibliography,
+        bib: &hayagriva_csl::RenderedBibliography,
         output: &mut String,
         is_full: bool,
     ) -> Result<(), fmt::Error> {
@@ -657,7 +658,7 @@ mod citeproc_bib {
     }
 
     fn render_item(
-        item: &hayagriva::BibliographyItem,
+        item: &hayagriva_csl::BibliographyItem,
         output: &mut String,
         is_full: bool,
     ) -> Result<(), fmt::Error> {
@@ -712,7 +713,7 @@ mod citeproc_bib {
     /// this notation, especially since we do not expose csl-json input to
     /// hayagriva users anyway.
     fn render_formatted_text(
-        text: &hayagriva::Formatted,
+        text: &hayagriva_csl::Formatted,
         output: &mut String,
     ) -> Result<(), fmt::Error> {
         let formatting = text.formatting;
@@ -830,8 +831,9 @@ fn purposes() {
         panic!("test has dependent style");
     };
 
-    let item: csl_json::Item = serde_json::from_str(
-        r#"{
+    let item = hayagriva_json::Item(
+        serde_json::from_str(
+            r#"{
         "id": "ITEM-1",
         "title": "Book A",
         "author": [
@@ -849,8 +851,9 @@ fn purposes() {
         },
         "type": "book"
     }"#,
-    )
-    .unwrap();
+        )
+        .unwrap(),
+    );
 
     for (purpose, res) in [
         (CitePurpose::Author, "Doe"),
@@ -858,7 +861,7 @@ fn purposes() {
         (CitePurpose::Year, "2000"),
         (CitePurpose::Full, "Doe, J. (2000). Book A."),
     ] {
-        let mut driver: BibliographyDriver<'_, csl_json::Item> =
+        let mut driver: BibliographyDriver<'_, hayagriva_json::Item> =
             BibliographyDriver::new();
         driver.citation(CitationRequest::new(
             vec![CitationItem::new(&item, None, None, false, Some(purpose))],
@@ -872,7 +875,7 @@ fn purposes() {
         let mut buf = String::new();
         rendered.citations[0]
             .citation
-            .write_buf(&mut buf, hayagriva::BufWriteFormat::Plain)
+            .write_buf(&mut buf, hayagriva_csl::BufWriteFormat::Plain)
             .unwrap();
         assert_eq!(buf, res);
     }
@@ -920,16 +923,19 @@ fn case_folding() {
         panic!("test has dependent style");
     };
 
-    let item: csl_json::Item = serde_json::from_str(
-        r#"{
+    let item: hayagriva_json::Item = hayagriva_json::Item(
+        serde_json::from_str(
+            r#"{
         "id": "ITEM-1",
         "container-title": "my lowercase container title",
         "type": "paper-conference"
     }"#,
-    )
-    .unwrap();
+        )
+        .unwrap(),
+    );
 
-    let mut driver: BibliographyDriver<'_, csl_json::Item> = BibliographyDriver::new();
+    let mut driver: BibliographyDriver<'_, hayagriva_json::Item> =
+        BibliographyDriver::new();
     driver.citation(CitationRequest::new(
         vec![CitationItem::new(&item, None, None, false, None)],
         &style,
@@ -946,7 +952,7 @@ fn case_folding() {
     let mut buf = String::new();
     rendered.bibliography.unwrap().items[0]
         .content
-        .write_buf(&mut buf, hayagriva::BufWriteFormat::Plain)
+        .write_buf(&mut buf, hayagriva_csl::BufWriteFormat::Plain)
         .unwrap();
     assert_eq!(buf, "my lowercase container title.");
 }
@@ -982,7 +988,7 @@ fn access_date() {
     let mut buf = String::new();
     rendered.bibliography.unwrap().items[0]
         .content
-        .write_buf(&mut buf, hayagriva::BufWriteFormat::Plain)
+        .write_buf(&mut buf, hayagriva_csl::BufWriteFormat::Plain)
         .unwrap();
     assert_eq!(buf, "(n.d.). Retrieved 2021, from https://example.com/");
 }
@@ -1023,7 +1029,7 @@ fn no_author() {
     let mut buf = String::new();
     rendered.bibliography.unwrap().items[0]
         .content
-        .write_buf(&mut buf, hayagriva::BufWriteFormat::Plain)
+        .write_buf(&mut buf, hayagriva_csl::BufWriteFormat::Plain)
         .unwrap();
 
     assert_eq!(
@@ -1034,7 +1040,7 @@ fn no_author() {
     let mut buf = String::new();
     rendered.citations[0]
         .citation
-        .write_buf(&mut buf, hayagriva::BufWriteFormat::Plain)
+        .write_buf(&mut buf, hayagriva_csl::BufWriteFormat::Plain)
         .unwrap();
     assert_eq!(buf, "(Definition and Objectives of Systems Development, 2016)");
 }

@@ -9,7 +9,10 @@ use citationberg::{
 use hayagriva_core::{
     ChunkedString, Date, EntryLike, MaybeTyped, Numeric, PageRanges, Person, StringChunk,
 };
+use serde::{Deserialize, Serialize};
 
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash)]
+#[serde(transparent)]
 pub struct Item(pub csl_json::Item);
 
 fn resolve_csl_json_standard_variable(

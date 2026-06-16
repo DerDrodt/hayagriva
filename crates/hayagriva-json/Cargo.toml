@@ -12,3 +12,4 @@ keywords.workspace = true
 [dependencies]
 citationberg = { workspace = true, features = ["json"] }
 hayagriva-core = { path = "../hayagriva-core" }
+serde = { workspace = true, features = ["derive"] }

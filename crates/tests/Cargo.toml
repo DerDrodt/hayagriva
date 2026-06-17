@@ -16,7 +16,6 @@ hayagriva-core = { path = "../hayagriva-core" }
 hayagriva-csl = { path = "../hayagriva-csl" }
 hayagriva-format = { path = "../hayagriva-format", features = ["biblatex"] }
 hayagriva-json = { path = "../hayagriva-json" }
-hayagriva-util = { path = "../hayagriva-util" }
 serde_json = "1"
 regex = "1"
 unscanny = { workspace = true }

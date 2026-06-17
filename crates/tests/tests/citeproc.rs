@@ -8,7 +8,7 @@ use std::{fmt, fs};
 
 use citationberg::taxonomy::Locator;
 use citationberg::{Locale, LocaleCode, Style, XmlDeError};
-use hayagriva_util::test_util::{CACHE_PATH, ensure_repo, iter_files_with_name};
+use hayagriva_core::test_util::{CACHE_PATH, ensure_repo, iter_files_with_name};
 
 use citationberg::json as csl_json;
 use hayagriva_archive::{ArchivedStyle, locales};

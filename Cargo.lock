@@ -208,7 +208,7 @@ version = "0.10.1"
 dependencies = [
  "ciborium",
  "citationberg",
- "hayagriva-util",
+ "hayagriva-core",
  "heck",
  "serde",
 ]
@@ -285,10 +285,6 @@ dependencies = [
  "hayagriva-core",
  "serde",
 ]
-
-[[package]]
-name = "hayagriva-util"
-version = "0.10.1"
 
 [[package]]
 name = "heck"
@@ -757,7 +753,6 @@ dependencies = [
  "hayagriva-csl",
  "hayagriva-format",
  "hayagriva-json",
- "hayagriva-util",
  "regex",
  "serde_json",
  "unscanny",

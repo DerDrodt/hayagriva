@@ -1,4 +1,5 @@
 pub mod lang;
+pub mod test_util;
 pub mod types;
 pub mod util;
 

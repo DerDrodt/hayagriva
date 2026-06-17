@@ -27,8 +27,7 @@ use std::{
     iter::{self, FromIterator},
 };
 
-extern crate hayagriva_util;
-use hayagriva_util::test_util::{
+use hayagriva_core::test_util::{
     CACHE_PATH, ensure_repo, iter_files, iter_files_with_name,
 };
 

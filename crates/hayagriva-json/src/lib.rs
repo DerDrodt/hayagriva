@@ -1,3 +1,8 @@
+//! Hayagriva CSL-JSON handling.
+//!
+//! This crate contains a wrapper around [citationberg]'s [csl_json::Item] and
+//! handles the resolution of CSL variables from [Item].
+
 use std::{borrow::Cow, str::FromStr};
 
 use citationberg::{

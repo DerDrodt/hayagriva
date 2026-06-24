@@ -1,4 +1,7 @@
 //! Provides conversion methods for BibLaTeX.
+//!
+//! Should you need more manual control of the conversion from Bib(la)TeX to
+//! Hayagriva, use the conversion functions in this module.
 
 use std::convert::TryFrom;
 

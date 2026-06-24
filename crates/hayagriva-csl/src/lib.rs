@@ -1,3 +1,66 @@
+//! Hayagriva CSL rendering
+//!
+//! # Usage
+//!
+//! We show a simple example using the Hayagriva format but the usage is similar for CSL-JSON.
+//!
+//! ```rust
+//! use hayagriva_format::io::from_yaml_str;
+//!
+//! let yaml = r#"
+//! crazy-rich:
+//!     type: Book
+//!     title: Crazy Rich Asians
+//!     author: Kwan, Kevin
+//!     date: 2014
+//!     publisher: Anchor Books
+//!     location: New York, NY, US
+//! "#;
+//!
+//! // Parse a bibliography
+//! let bib = from_yaml_str(yaml).unwrap();
+//! assert_eq!(bib.get("crazy-rich").unwrap().date().unwrap().year, 2014);
+//!
+//! // Format the reference
+//! use std::fs;
+//! use hayagriva_csl::{
+//!     BibliographyDriver, BibliographyRequest, BufWriteFormat,
+//!     CitationItem, CitationRequest,
+//! };
+//! use citationberg::{LocaleFile, IndependentStyle};
+//!
+//! let en_locale = fs::read_to_string("../tests/tests/data/locales-en-US.xml").unwrap();
+//! let locales = [LocaleFile::from_xml(&en_locale).unwrap().into()];
+//!
+//! let style = fs::read_to_string("../tests/tests/data/art-history.csl").unwrap();
+//! let style = IndependentStyle::from_xml(&style).unwrap();
+//!
+//! let mut driver = BibliographyDriver::new();
+//!
+//! for entry in bib.iter() {
+//!     let items = vec![CitationItem::with_entry(entry)];
+//!     driver.citation(CitationRequest::from_items(items, &style, &locales));
+//! }
+//!
+//! let result = driver.finish(BibliographyRequest {
+//!     style: &style,
+//!     locale: None,
+//!     locale_files: &locales,
+//! });
+//!
+//! for cite in result.citations {
+//!     println!("{}", cite.citation)
+//! }
+//! ```
+//!
+//! To format entries, you need to wrap them in a [`CitationRequest`]. Each of these
+//! can reference multiple entries in their respective [`CitationItem`]s.
+//! Use these with a [`BibliographyDriver`] to obtain formatted citations and bibliographies.
+//!
+//! Hayagriva supports BibTeX and BibLaTeX bibliographies via translation to
+//! the Hayagriva format. You can use
+//! [`hayagriva_format::io::from_biblatex_str`] to parse such bibliographies.
+
 use std::any::Any;
 use std::borrow::Cow;
 use std::cell::RefCell;

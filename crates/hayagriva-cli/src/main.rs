@@ -16,73 +16,8 @@ Hayagriva supports all styles provided in the
 currently over 2,600. You can provide your own style files or use the ones
 bundled with this library in the [`hayagriva_archive`] crate.
 
-# Usage
-
-```rust
-use hayagriva::io::from_yaml_str;
-
-let yaml = r#"
-crazy-rich:
-    type: Book
-    title: Crazy Rich Asians
-    author: Kwan, Kevin
-    date: 2014
-    publisher: Anchor Books
-    location: New York, NY, US
-"#;
-
-// Parse a bibliography
-let bib = from_yaml_str(yaml).unwrap();
-assert_eq!(bib.get("crazy-rich").unwrap().date().unwrap().year, 2014);
-
-// Format the reference
-use std::fs;
-use hayagriva::{
-    BibliographyDriver, BibliographyRequest, BufWriteFormat,
-    CitationItem, CitationRequest,
-};
-use hayagriva::citationberg::{LocaleFile, IndependentStyle};
-
-let en_locale = fs::read_to_string("tests/data/locales-en-US.xml").unwrap();
-let locales = [LocaleFile::from_xml(&en_locale).unwrap().into()];
-
-let style = fs::read_to_string("tests/data/art-history.csl").unwrap();
-let style = IndependentStyle::from_xml(&style).unwrap();
-
-let mut driver = BibliographyDriver::new();
-
-for entry in bib.iter() {
-    let items = vec![CitationItem::with_entry(entry)];
-    driver.citation(CitationRequest::from_items(items, &style, &locales));
-}
-
-let result = driver.finish(BibliographyRequest {
-    style: &style,
-    locale: None,
-    locale_files: &locales,
-});
-
-for cite in result.citations {
-    println!("{}", cite.citation)
-}
-```
-
-To format entries, you need to wrap them in a [`CitationRequest`]. Each of these
-can reference multiple entries in their respective [`CitationItem`]s.
-Use these with a [`BibliographyDriver`] to obtain formatted citations and bibliographies.
-
-If the default features are enabled, Hayagriva supports BibTeX and BibLaTeX
-bibliographies. You can use [`io::from_biblatex_str`] to parse such
-bibliographies.
-
-Should you need more manual control, the library's native `Entry` struct
-also offers an implementation of the `From<&biblatex::Entry>`-Trait. You will
-need to depend on the [biblatex](https://docs.rs/biblatex/latest/biblatex/)
-crate to obtain its `Entry`. Therefore, you could also use your BibLaTeX
-content like this:
-
 ```ignore
-use hayagriva::Entry;
+use hayagriva_format::Entry;
 let converted: Entry = your_biblatex_entry.into();
 ```
 
@@ -93,46 +28,6 @@ default features by writing this in your `Cargo.toml`:
 [dependencies]
 hayagriva = { version = "0.9", default-features = false }
 ```
-
-# Selectors
-
-Hayagriva uses a custom selector language that enables you to filter
-bibliographies by type of media. For more information about selectors, refer
-to the [selectors.md
-file](https://github.com/typst/hayagriva/blob/main/docs/selectors.md). While
-you can parse user-defined selectors using the function `Selector::parse`,
-you may instead want to use the selector macro to avoid the run time cost of
-parsing a selector when working with constant selectors.
-
-```rust
-use hayagriva::select;
-use hayagriva::io::from_yaml_str;
-
-let yaml = r#"
-quantized-vortex:
-    type: Article
-    author: Gross, E. P.
-    title: Structure of a Quantized Vortex in Boson Systems
-    date: 1961-05
-    page-range: 454-477
-    serial-number:
-        doi: 10.1007/BF02731494
-    parent:
-        issue: 3
-        volume: 20
-        title: Il Nuovo Cimento
-"#;
-
-let entries = from_yaml_str(yaml).unwrap();
-let journal = select!((Article["date"]) > ("journal":Periodical));
-assert!(journal.matches(entries.nth(0).unwrap()));
-```
-
-There are two ways to check if a selector matches an entry.
-You should use [`Selector::matches`] if you just want to know if an item
-matches a selector and [`Selector::apply`] to continue to work with the data from
-parents of a matching entry. Keep in mind that the latter function will
-return `Some` even if no sub-entry was bound / if the hash map is empty.
 */
 
 use std::borrow::Cow;

@@ -23,3 +23,7 @@ biblatex = { workspace = true, optional = true }
 [features]
 default = ["biblatex"]
 biblatex = ["hayagriva-format/biblatex", "dep:biblatex"]
+
+[[bin]]
+name = "hayagriva"
+path = "src/main.rs"

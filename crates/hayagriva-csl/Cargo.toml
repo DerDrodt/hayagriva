@@ -16,3 +16,6 @@ icu_collator = "2.2.0"
 icu_locale = "2.2.0"
 hayagriva-core = { path = "../hayagriva-core" }
 unic-langid = { workspace = true }
+
+[dev-dependencies]
+hayagriva-format = { path = "../hayagriva-format" }

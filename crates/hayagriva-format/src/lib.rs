@@ -1,4 +1,64 @@
-//! The Hayagriva format
+//! The Hayagriva YAML-backed format.
+//!
+//! # Usage
+//!
+//! ```rust
+//! use hayagriva_format::io::from_yaml_str;
+//!
+//! let yaml = r#"
+//! crazy-rich:
+//!     type: Book
+//!     title: Crazy Rich Asians
+//!     author: Kwan, Kevin
+//!     date: 2014
+//!     publisher: Anchor Books
+//!     location: New York, NY, US
+//! "#;
+//!
+//! // Parse a bibliography
+//! let bib = from_yaml_str(yaml).unwrap();
+//! assert_eq!(bib.get("crazy-rich").unwrap().date().unwrap().year, 2014);
+//! ```
+//!
+//! # Selectors
+//!
+//! Hayagriva uses a custom selector language that enables you to filter
+//! bibliographies by type of media. For more information about selectors, refer
+//! to the [selectors.md
+//! file](https://github.com/typst/hayagriva/blob/main/docs/selectors.md). While
+//! you can parse user-defined selectors using the function `Selector::parse`,
+//! you may instead want to use the selector macro to avoid the run time cost of
+//! parsing a selector when working with constant selectors.
+//!
+//! ```rust
+//! use hayagriva_format::select;
+//! use hayagriva_format::io::from_yaml_str;
+//!
+//! let yaml = r#"
+//! quantized-vortex:
+//!     type: Article
+//!     author: Gross, E. P.
+//!     title: Structure of a Quantized Vortex in Boson Systems
+//!     date: 1961-05
+//!     page-range: 454-477
+//!     serial-number:
+//!         doi: 10.1007/BF02731494
+//!     parent:
+//!         issue: 3
+//!         volume: 20
+//!         title: Il Nuovo Cimento
+//! "#;
+//!
+//! let entries = from_yaml_str(yaml).unwrap();
+//! let journal = select!((Article["date"]) > ("journal":Periodical));
+//! assert!(journal.matches(entries.nth(0).unwrap()));
+//! ```
+//!
+//! There are two ways to check if a selector matches an entry.
+//! You should use [`Selector::matches`] if you just want to know if an item
+//! matches a selector and [`Selector::apply`] to continue to work with the data from
+//! parents of a matching entry. Keep in mind that the latter function will
+//! return `Some` even if no sub-entry was bound / if the hash map is empty.
 
 #![warn(missing_docs)]
 #![allow(clippy::comparison_chain)]
@@ -8,7 +68,7 @@ mod selectors;
 
 pub mod citation_label;
 #[cfg(feature = "biblatex")]
-mod interop;
+pub mod interop;
 pub mod io;
 pub mod taxonomy;
 

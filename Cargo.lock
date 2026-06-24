@@ -251,6 +251,7 @@ version = "0.10.1"
 dependencies = [
  "citationberg",
  "hayagriva-core",
+ "hayagriva-format",
  "icu_collator",
  "icu_locale",
  "indexmap",

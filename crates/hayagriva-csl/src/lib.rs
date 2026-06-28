@@ -56,10 +56,6 @@
 //! To format entries, you need to wrap them in a [`CitationRequest`]. Each of these
 //! can reference multiple entries in their respective [`CitationItem`]s.
 //! Use these with a [`BibliographyDriver`] to obtain formatted citations and bibliographies.
-//!
-//! Hayagriva supports BibTeX and BibLaTeX bibliographies via translation to
-//! the Hayagriva format. You can use
-//! [`hayagriva_format::io::from_biblatex_str`] to parse such bibliographies.
 
 use std::any::Any;
 use std::borrow::Cow;

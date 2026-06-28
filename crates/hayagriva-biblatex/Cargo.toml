@@ -8,3 +8,9 @@ license.workspace = true
 repository.workspace = true
 readme.workspace = true
 keywords.workspace = true
+
+[dependencies]
+hayagriva-core = { path = "../hayagriva-core" }
+biblatex = { workspace = true, features = ["unic-langid"] }
+citationberg = { workspace = true }
+unic-langid = { workspace = true }

@@ -216,6 +216,12 @@ dependencies = [
 [[package]]
 name = "hayagriva-biblatex"
 version = "0.10.1"
+dependencies = [
+ "biblatex",
+ "citationberg",
+ "hayagriva-core",
+ "unic-langid",
+]
 
 [[package]]
 name = "hayagriva-cli"

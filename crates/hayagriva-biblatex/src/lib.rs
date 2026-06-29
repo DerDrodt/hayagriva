@@ -1,10 +1,11 @@
 use std::borrow::Cow;
 
-use biblatex::{ChunksExt, PermissiveType};
+use biblatex::{ChunksExt, EntryType, PermissiveType};
 use citationberg::{
     LongShortForm,
     taxonomy::{
-        self, DateVariable, NameVariable, NumberVariable, PageVariable, StandardVariable,
+        self, DateVariable, Kind, NameVariable, NumberVariable, PageVariable,
+        StandardVariable,
     },
 };
 use hayagriva_core::{EntryLike, MaybeTyped, Numeric, PageRanges, PageRangesPart};
@@ -175,7 +176,53 @@ impl EntryLike for Entry {
     }
 
     fn matches_entry_type(&self, kind: taxonomy::Kind) -> bool {
-        todo!()
+        let ty = &self.0.entry_type;
+        match kind {
+            Kind::Article
+            | Kind::ArticleJournal
+            | Kind::ArticleMagazine
+            | Kind::ArticleNewspaper => ty == &EntryType::Article,
+            Kind::Bill => {
+                is_non_standard_type(ty, "legislation") && self.0.publisher().is_err()
+            }
+            Kind::Book => ty == &EntryType::Book,
+            Kind::Broadcast => false,
+            Kind::Chapter => ty == &EntryType::InCollection,
+            Kind::Classic => false,
+            Kind::Collection => ty == &EntryType::Collection,
+            Kind::Dataset => ty == &EntryType::Dataset,
+            Kind::Document => ty == &EntryType::Misc,
+            Kind::Entry | Kind::EntryDictionary | Kind::EntryEncyclopedia => {
+                ty == &EntryType::InReference
+            }
+            Kind::Event => false,
+            Kind::Figure | Kind::Graphic => is_non_standard_type(ty, "image"),
+            Kind::Hearing => false,
+            Kind::Interview => ty == &EntryType::Misc,
+            Kind::LegalCase => is_non_standard_type(ty, "jurisdiction"),
+            Kind::Legislation => is_non_standard_type(ty, "legislation"),
+            Kind::Manuscript => ty == &EntryType::Unpublished,
+            Kind::Map => false,
+            Kind::MotionPicture => is_non_standard_type(ty, "movie"),
+            Kind::MusicalScore => is_non_standard_type(ty, "audio"),
+            Kind::Pamphlet => ty == &EntryType::Booklet,
+            Kind::PaperConference => ty == &EntryType::InProceedings,
+            Kind::Patent => ty == &EntryType::Patent,
+            Kind::Performance => false,
+            Kind::Periodical => ty == &EntryType::Periodical,
+            Kind::PersonalCommunication => is_non_standard_type(ty, "letter"),
+            Kind::Post | Kind::PostWeblog => ty == &EntryType::Online,
+            Kind::Regulation => false,
+            Kind::Report => ty == &EntryType::Report,
+            Kind::Review | Kind::ReviewBook => is_non_standard_type(ty, "review"),
+            Kind::Software => ty == &EntryType::Software,
+            Kind::Song => is_non_standard_type(ty, "music"),
+            Kind::Speech => false,
+            Kind::Standard => false,
+            Kind::Thesis => ty == &EntryType::Thesis,
+            Kind::Treaty => is_non_standard_type(ty, "legal"),
+            Kind::Webpage => ty == &EntryType::Online,
+        }
     }
 
     fn is_english(&self) -> Option<bool> {
@@ -189,5 +236,15 @@ impl EntryLike for Entry {
 
     fn key(&self) -> Cow<'_, str> {
         Cow::Borrowed(&self.0.key)
+    }
+}
+
+fn is_non_standard_type(ty: &EntryType, label: &str) -> bool {
+    if let EntryType::Unknown(s) = ty
+        && &s.to_lowercase() == label
+    {
+        true
+    } else {
+        false
     }
 }

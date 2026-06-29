@@ -1,3 +1,5 @@
+#[cfg(feature = "biblatex")]
+pub mod biblatex_conversion;
 pub mod lang;
 pub mod test_util;
 pub mod types;

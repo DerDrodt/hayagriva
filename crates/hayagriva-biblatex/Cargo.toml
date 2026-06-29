@@ -10,7 +10,7 @@ readme.workspace = true
 keywords.workspace = true
 
 [dependencies]
-hayagriva-core = { path = "../hayagriva-core" }
+hayagriva-core = { path = "../hayagriva-core", features = ["biblatex"] }
 biblatex = { workspace = true, features = ["unic-langid"] }
 citationberg = { workspace = true }
 unic-langid = { workspace = true }

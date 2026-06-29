@@ -14,7 +14,7 @@ use tex::{
 use url::Url;
 
 use super::Entry;
-use hayagriva_core::types::*;
+use hayagriva_core::{biblatex_conversion::date, types::*};
 
 macro_rules! tex_kinds {
     ($self:expr, $mv_attr:expr, [$({$kind:pat, $new_kind:expr, $top_level:expr, $expand_mv:expr}),* $(,)*] $(,)*) => {
@@ -54,27 +54,6 @@ fn person(person: &tex::Person) -> Person {
         suffix: optional(&person.suffix),
         comma_suffix: false,
         alias: None,
-    }
-}
-
-fn date(date: tex::Date) -> Date {
-    let approximate = date.uncertain || date.approximate;
-
-    match date.value {
-        DateValue::At(x) | DateValue::After(x) | DateValue::Before(x) => Date {
-            year: x.year,
-            month: x.month,
-            day: x.day,
-            approximate,
-            season: None,
-        },
-        DateValue::Between(_, x) => Date {
-            year: x.year,
-            month: x.month,
-            day: x.day,
-            approximate,
-            season: None,
-        },
     }
 }
 

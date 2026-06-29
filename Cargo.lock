@@ -242,6 +242,7 @@ dependencies = [
 name = "hayagriva-core"
 version = "0.10.1"
 dependencies = [
+ "biblatex",
  "citationberg",
  "roman-numerals-rs",
  "serde",

@@ -9,6 +9,7 @@ readme.workspace = true
 keywords.workspace = true
 
 [dependencies]
+biblatex = { workspace = true, optional = true }
 serde = { workspace = true }
 url = { workspace = true }
 thiserror = { workspace = true }

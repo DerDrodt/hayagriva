@@ -4,11 +4,13 @@ use biblatex::{ChunksExt, EntryType, PermissiveType};
 use citationberg::{
     LongShortForm,
     taxonomy::{
-        self, DateVariable, Kind, NameVariable, NumberVariable, PageVariable,
-        StandardVariable,
+        DateVariable, Kind, NameVariable, NumberVariable, PageVariable, StandardVariable,
     },
 };
-use hayagriva_core::{EntryLike, MaybeTyped, Numeric, PageRanges, PageRangesPart};
+use hayagriva_core::{
+    Date, EntryLike, MaybeTyped, Numeric, PageRanges, PageRangesPart,
+    biblatex_conversion as conversion,
+};
 use unic_langid::LanguageIdentifier;
 
 pub struct Entry(pub biblatex::Entry);
@@ -161,21 +163,50 @@ impl EntryLike for Entry {
         }
     }
 
-    fn resolve_date_variable(
-        &self,
-        variable: DateVariable,
-    ) -> Option<Cow<'_, hayagriva_core::Date>> {
+    fn resolve_date_variable(&self, variable: DateVariable) -> Option<Cow<'_, Date>> {
         match variable {
-            DateVariable::Accessed => todo!(),
-            DateVariable::AvailableDate => todo!(),
-            DateVariable::EventDate => todo!(),
-            DateVariable::Issued => todo!(),
-            DateVariable::OriginalDate => todo!(),
-            DateVariable::Submitted => todo!(),
+            DateVariable::Accessed => self
+                .0
+                .url_date()
+                .ok()
+                .and_then(|d| match d {
+                    PermissiveType::Typed(t) => Some(t),
+                    PermissiveType::Chunks(_) => None,
+                })
+                .map(|d| Cow::Owned(conversion::date(d))),
+            DateVariable::AvailableDate => None,
+            DateVariable::EventDate => self
+                .0
+                .event_date()
+                .ok()
+                .and_then(|d| match d {
+                    PermissiveType::Typed(t) => Some(t),
+                    PermissiveType::Chunks(_) => None,
+                })
+                .map(|d| Cow::Owned(conversion::date(d))),
+            DateVariable::Issued => self
+                .0
+                .date()
+                .ok()
+                .and_then(|d| match d {
+                    PermissiveType::Typed(t) => Some(t),
+                    PermissiveType::Chunks(_) => None,
+                })
+                .map(|d| Cow::Owned(conversion::date(d))),
+            DateVariable::OriginalDate => self
+                .0
+                .orig_date()
+                .ok()
+                .and_then(|d| match d {
+                    PermissiveType::Typed(t) => Some(t),
+                    PermissiveType::Chunks(_) => None,
+                })
+                .map(|d| Cow::Owned(conversion::date(d))),
+            DateVariable::Submitted => None,
         }
     }
 
-    fn matches_entry_type(&self, kind: taxonomy::Kind) -> bool {
+    fn matches_entry_type(&self, kind: Kind) -> bool {
         let ty = &self.0.entry_type;
         match kind {
             Kind::Article

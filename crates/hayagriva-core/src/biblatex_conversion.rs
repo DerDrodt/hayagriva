@@ -1,6 +1,6 @@
 use biblatex::{self as tex, DateValue};
 
-use crate::Date;
+use crate::{Date, Person};
 
 pub fn date(date: tex::Date) -> Date {
     let approximate = date.uncertain || date.approximate;
@@ -20,5 +20,20 @@ pub fn date(date: tex::Date) -> Date {
             approximate,
             season: None,
         },
+    }
+}
+
+pub fn person(person: &tex::Person) -> Person {
+    fn optional(part: &str) -> Option<String> {
+        if !part.is_empty() { Some(part.to_string()) } else { None }
+    }
+
+    Person {
+        name: person.name.clone(),
+        given_name: optional(&person.given_name),
+        prefix: optional(&person.prefix),
+        suffix: optional(&person.suffix),
+        comma_suffix: false,
+        alias: None,
     }
 }

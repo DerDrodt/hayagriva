@@ -7,14 +7,16 @@ use std::convert::TryFrom;
 
 use biblatex as tex;
 use tex::{
-    Chunk, ChunksExt, DateValue, EditorType, PermissiveType, RetrievalError, Spanned,
-    TypeError,
+    Chunk, ChunksExt, EditorType, PermissiveType, RetrievalError, Spanned, TypeError,
 };
 
 use url::Url;
 
 use super::Entry;
-use hayagriva_core::{biblatex_conversion::date, types::*};
+use hayagriva_core::{
+    biblatex_conversion::{date, person},
+    types::*,
+};
 
 macro_rules! tex_kinds {
     ($self:expr, $mv_attr:expr, [$({$kind:pat, $new_kind:expr, $top_level:expr, $expand_mv:expr}),* $(,)*] $(,)*) => {
@@ -40,21 +42,6 @@ macro_rules! tex_kinds {
             )*
         }
     };
-}
-
-fn person(person: &tex::Person) -> Person {
-    fn optional(part: &str) -> Option<String> {
-        if !part.is_empty() { Some(part.to_string()) } else { None }
-    }
-
-    Person {
-        name: person.name.clone(),
-        given_name: optional(&person.given_name),
-        prefix: optional(&person.prefix),
-        suffix: optional(&person.suffix),
-        comma_suffix: false,
-        alias: None,
-    }
 }
 
 fn chunks_to_chunked_str(chunks: &[Spanned<Chunk>]) -> ChunkedString {

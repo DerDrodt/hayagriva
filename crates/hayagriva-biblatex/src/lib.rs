@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use biblatex::{ChunksExt, EntryType, PermissiveType};
+use biblatex::{ChunksExt, EditorType, EntryType, PermissiveType};
 use citationberg::{
     LongShortForm,
     taxonomy::{
@@ -133,34 +133,44 @@ impl EntryLike for Entry {
         variable: NameVariable,
     ) -> Vec<Cow<'_, hayagriva_core::Person>> {
         match variable {
-            NameVariable::Author => todo!(),
-            NameVariable::Chair => todo!(),
-            NameVariable::CollectionEditor => todo!(),
-            NameVariable::Compiler => todo!(),
-            NameVariable::Composer => todo!(),
-            NameVariable::ContainerAuthor => todo!(),
-            NameVariable::Contributor => todo!(),
-            NameVariable::Curator => todo!(),
-            NameVariable::Director => todo!(),
-            NameVariable::Editor => todo!(),
-            NameVariable::EditorialDirector => todo!(),
-            NameVariable::EditorTranslator => todo!(),
-            NameVariable::ExecutiveProducer => todo!(),
-            NameVariable::Guest => todo!(),
-            NameVariable::Host => todo!(),
-            NameVariable::Illustrator => todo!(),
-            NameVariable::Interviewer => todo!(),
-            NameVariable::Narrator => todo!(),
-            NameVariable::Organizer => todo!(),
-            NameVariable::OriginalAuthor => todo!(),
-            NameVariable::Performer => todo!(),
-            NameVariable::Producer => todo!(),
-            NameVariable::Recipient => todo!(),
-            NameVariable::ReviewedAuthor => todo!(),
-            NameVariable::ScriptWriter => todo!(),
-            NameVariable::SeriesCreator => todo!(),
-            NameVariable::Translator => todo!(),
+            NameVariable::Author => self.0.author().ok(),
+            NameVariable::Chair => None,
+            NameVariable::CollectionEditor => None,
+            NameVariable::Compiler => self.editors_with_role(EditorType::Collaborator),
+            NameVariable::Composer => None,
+            NameVariable::ContainerAuthor => self.0.book_author().ok(),
+            NameVariable::Contributor => None,
+            NameVariable::Curator => None,
+            NameVariable::Director => {
+                if is_non_standard_type(&self.0.entry_type, "video") {
+                    self.editors_with_role(EditorType::Director)
+                } else {
+                    self.0.author().ok()
+                }
+            }
+            NameVariable::Editor => self.editors_with_role(EditorType::Editor),
+            NameVariable::EditorialDirector => None,
+            NameVariable::EditorTranslator => None,
+            NameVariable::ExecutiveProducer => None,
+            NameVariable::Guest => None,
+            NameVariable::Host => None,
+            NameVariable::Illustrator => None,
+            NameVariable::Interviewer => None,
+            NameVariable::Narrator => None,
+            NameVariable::Organizer => self.editors_with_role(EditorType::Organizer),
+            NameVariable::OriginalAuthor => None,
+            NameVariable::Performer => None,
+            NameVariable::Producer => None,
+            NameVariable::Recipient => None,
+            NameVariable::ReviewedAuthor => None,
+            NameVariable::ScriptWriter => None,
+            NameVariable::SeriesCreator => None,
+            NameVariable::Translator => self.0.translator().ok(),
         }
+        .unwrap_or_default()
+        .into_iter()
+        .map(|p| Cow::Owned(conversion::person(&p)))
+        .collect()
     }
 
     fn resolve_date_variable(&self, variable: DateVariable) -> Option<Cow<'_, Date>> {
@@ -267,6 +277,22 @@ impl EntryLike for Entry {
 
     fn key(&self) -> Cow<'_, str> {
         Cow::Borrowed(&self.0.key)
+    }
+}
+
+impl Entry {
+    fn editors_with_role(&self, role: EditorType) -> Option<Vec<biblatex::Person>> {
+        let mut result = vec![];
+        if let Ok(eds_with_roles) = self.0.editors() {
+            for (eds, r) in eds_with_roles.iter() {
+                if r == &role {
+                    for ed in eds {
+                        result.push(ed.clone())
+                    }
+                }
+            }
+        }
+        Some(result)
     }
 }
 

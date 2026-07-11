@@ -85,6 +85,76 @@ impl ValueEnum for Format {
     }
 }
 
+#[derive(ValueEnum, Clone)]
+enum LocatorTypes {
+    Act,
+    Appendix,
+    ArticleLocator,
+    Book,
+    Canon,
+    Chapter,
+    Column,
+    #[value(name = "e-location")]
+    Elocation,
+    Equation,
+    Figure,
+    Folio,
+    Issue,
+    Line,
+    Note,
+    Opus,
+    Page,
+    Paragraph,
+    Part,
+    Rule,
+    Scene,
+    Section,
+    SubVerbo,
+    Supplement,
+    Table,
+    Timestamp,
+    Title,
+    TitleLocator,
+    Verse,
+    Volume,
+}
+
+impl From<&LocatorTypes> for Locator {
+    fn from(value: &LocatorTypes) -> Self {
+        match value {
+            LocatorTypes::Act => Locator::Act,
+            LocatorTypes::Appendix => Locator::Appendix,
+            LocatorTypes::ArticleLocator => Locator::ArticleLocator,
+            LocatorTypes::Book => Locator::Book,
+            LocatorTypes::Canon => Locator::Canon,
+            LocatorTypes::Chapter => Locator::Chapter,
+            LocatorTypes::Column => Locator::Column,
+            LocatorTypes::Elocation => Locator::Elocation,
+            LocatorTypes::Equation => Locator::Equation,
+            LocatorTypes::Figure => Locator::Figure,
+            LocatorTypes::Folio => Locator::Folio,
+            LocatorTypes::Issue => Locator::Issue,
+            LocatorTypes::Line => Locator::Line,
+            LocatorTypes::Note => Locator::Note,
+            LocatorTypes::Opus => Locator::Opus,
+            LocatorTypes::Page => Locator::Page,
+            LocatorTypes::Paragraph => Locator::Paragraph,
+            LocatorTypes::Part => Locator::Part,
+            LocatorTypes::Rule => Locator::Rule,
+            LocatorTypes::Scene => Locator::Scene,
+            LocatorTypes::Section => Locator::Section,
+            LocatorTypes::SubVerbo => Locator::SubVerbo,
+            LocatorTypes::Supplement => Locator::Supplement,
+            LocatorTypes::Table => Locator::Table,
+            LocatorTypes::Timestamp => Locator::Timestamp,
+            LocatorTypes::Title => Locator::Title,
+            LocatorTypes::TitleLocator => Locator::TitleLocator,
+            LocatorTypes::Verse => Locator::Verse,
+            LocatorTypes::Volume => Locator::Volume,
+        }
+    }
+}
+
 /// Main function of the Hayagriva CLI.
 fn main() {
     let matches = Command::new("Hayagriva CLI")
@@ -176,6 +246,28 @@ fn main() {
                             .long("locators")
                             .help("Specify additional information for the citations, e.g. \"p. 6,p. 4\", in a comma-separated list.")
                             .num_args(1)
+                    )
+                    .arg(
+                        Arg::new("locator_type")
+                            .long("type")
+                            .help("Specify the type of the locator, e.g. page number, line number, timestamp.")
+                            .value_parser(clap::value_parser!(LocatorTypes))
+                            .hide_possible_values(true)
+                            .long_help(r#"Specify the type of the locator, e.g. page number, line number, timestamp.
+
+Possible values:
+act         appendix        article-locator
+book        canon           chapter
+column      e-location      equation
+figure      folio           issue
+line        note            opus
+page        paragraph       part
+rule        scene           section
+sub-verbo   supplement      table
+timestamp   title           title-locator
+verse       volume"#)
+                            .ignore_case(true)
+                            .num_args(1..)
                     )
                     .arg(
                         Arg::new("combined")
@@ -402,11 +494,16 @@ fn main() {
             let (style, locales, locale) =
                 retrieve_assets(style, csl, locale_path, locale_str);
 
+            let indicated_locator = sub_matches
+                .get_one::<LocatorTypes>("locator_type")
+                .map(Into::into)
+                .unwrap_or(Locator::Custom);
+
             let assign_locator = |(i, e)| {
                 let mut item = CitationItem::with_entry(e);
                 if let Some(&locator) = locators.get(i) {
                     item.locator = Some(SpecificLocator(
-                        Locator::Custom,
+                        indicated_locator,
                         LocatorPayload::Str(locator),
                     ));
                 }

@@ -11,7 +11,7 @@ keywords.workspace = true
 
 [dependencies]
 citationberg = { workspace = true }
-clap = { version = "4", features = ["cargo"] }
+clap = { version = "4", features = ["cargo", "derive"] }
 hayagriva-archive = { path = "../hayagriva-archive" }
 hayagriva-biblatex = { path = "../hayagriva-biblatex" }
 hayagriva-core = { path = "../hayagriva-core" }

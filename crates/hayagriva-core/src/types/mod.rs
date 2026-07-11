@@ -333,6 +333,14 @@ impl<T: ToOwned> MaybeTyped<T> {
             MaybeTyped::String(s) => MaybeTyped::String(s.clone()),
         }
     }
+
+    /// Wrap the typed value in a [`Cow`]'s owned variant.
+    pub fn to_cow_owned<'a>(self) -> MaybeTyped<Cow<'a, T>> {
+        match self {
+            MaybeTyped::Typed(t) => MaybeTyped::Typed(Cow::Owned(t.to_owned())),
+            MaybeTyped::String(s) => MaybeTyped::String(s.clone()),
+        }
+    }
 }
 
 impl<T: Display> Display for MaybeTyped<T> {

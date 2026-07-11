@@ -1,6 +1,6 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, str::FromStr};
 
-use biblatex::{ChunksExt, EditorType, EntryType, PermissiveType};
+use biblatex::{Chunk, ChunksExt, EditorType, EntryType, PermissiveType, Spanned};
 use citationberg::{
     LongShortForm,
     taxonomy::{
@@ -21,23 +21,74 @@ impl EntryLike for Entry {
         variable: NumberVariable,
     ) -> Option<hayagriva_core::MaybeTyped<Cow<'_, hayagriva_core::Numeric>>> {
         match variable {
-            NumberVariable::ChapterNumber => todo!(),
-            NumberVariable::CitationNumber => todo!(),
-            NumberVariable::CollectionNumber => todo!(),
-            NumberVariable::Edition => todo!(),
-            NumberVariable::FirstReferenceNoteNumber => todo!(),
-            NumberVariable::Issue => todo!(),
-            NumberVariable::Locator => todo!(),
-            NumberVariable::Number => todo!(),
-            NumberVariable::NumberOfPages => todo!(),
-            NumberVariable::NumberOfVolumes => todo!(),
-            NumberVariable::PageFirst => todo!(),
-            NumberVariable::PartNumber => todo!(),
-            NumberVariable::PrintingNumber => todo!(),
-            NumberVariable::Section => todo!(),
-            NumberVariable::SupplementNumber => todo!(),
-            NumberVariable::Version => todo!(),
-            NumberVariable::Volume => todo!(),
+            NumberVariable::ChapterNumber => self
+                .0
+                .chapter()
+                .ok()
+                .map(chunks_to_mby_numeric)
+                .map(MaybeTyped::to_cow_owned),
+            NumberVariable::CitationNumber => panic!("processor must resolve this"),
+            NumberVariable::CollectionNumber => None,
+            NumberVariable::Edition => self
+                .0
+                .edition()
+                .ok()
+                .as_ref()
+                .map(permissive_to_mby_numeric)
+                .map(MaybeTyped::to_cow_owned),
+            NumberVariable::FirstReferenceNoteNumber => {
+                panic!("processor must resolve this")
+            }
+            NumberVariable::Issue => self
+                .0
+                .issue()
+                .ok()
+                .map(chunks_to_mby_numeric)
+                .map(MaybeTyped::to_cow_owned),
+            NumberVariable::Locator => panic!("processor must resolve this"),
+            NumberVariable::Number => {
+                if matches!(self.0.entry_type, EntryType::Report | EntryType::Reference) {
+                    self.0
+                        .number()
+                        .ok()
+                        .map(chunks_to_mby_numeric)
+                        .map(MaybeTyped::to_cow_owned)
+                } else {
+                    None
+                }
+            }
+            NumberVariable::NumberOfPages => self
+                .0
+                .page_total()
+                .ok()
+                .and_then(|c| c.format_verbatim().parse::<Numeric>().ok())
+                .map(|n| MaybeTyped::Typed(Cow::Owned(n))),
+            NumberVariable::NumberOfVolumes => self
+                .0
+                .volumes()
+                .ok()
+                .map(|v| MaybeTyped::Typed(Cow::Owned(Numeric::new(v as i32)))),
+            NumberVariable::PageFirst => self
+                .resolve_page_variable(PageVariable::Page)
+                .as_ref()
+                .and_then(MaybeTyped::as_typed)
+                .and_then(PageRanges::first)
+                .map(|r| MaybeTyped::Typed(Cow::Owned(r.clone()))),
+            NumberVariable::PartNumber => None,
+            NumberVariable::PrintingNumber => None,
+            NumberVariable::Section => None,
+            NumberVariable::SupplementNumber => None,
+            NumberVariable::Version => self.0.version().ok().map(|v| {
+                let version = v.format_verbatim();
+                Numeric::from_str(&version)
+                    .map(|n| MaybeTyped::Typed(Cow::Owned(n)))
+                    .unwrap_or_else(|_| MaybeTyped::String(version.to_owned()))
+            }),
+            NumberVariable::Volume => self
+                .0
+                .volume()
+                .ok()
+                .map(|v| permissive_to_mby_numeric(&v).to_cow_owned()),
         }
     }
 
@@ -304,4 +355,20 @@ fn is_non_standard_type(ty: &EntryType, label: &str) -> bool {
     } else {
         false
     }
+}
+
+fn permissive_to_mby_numeric(
+    edition_or_volume: &PermissiveType<i64>,
+) -> MaybeTyped<Numeric> {
+    match edition_or_volume {
+        PermissiveType::Typed(i) => MaybeTyped::Typed(Numeric::new(*i as i32)),
+        PermissiveType::Chunks(c) => {
+            MaybeTyped::infallible_from_str(&c.format_verbatim())
+        }
+    }
+}
+
+fn chunks_to_mby_numeric(chunks: &[Spanned<Chunk>]) -> MaybeTyped<Numeric> {
+    let verb = chunks.format_verbatim();
+    MaybeTyped::infallible_from_str(&verb)
 }

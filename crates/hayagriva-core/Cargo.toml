@@ -16,4 +16,5 @@ thiserror = { workspace = true }
 citationberg = { workspace = true }
 unscanny = { workspace = true }
 roman-numerals-rs = "3.1.0"
+unic-langid = { workspace = true }
 unicode-segmentation = { workspace = true }

@@ -8,8 +8,9 @@ use citationberg::{
     },
 };
 use hayagriva_core::{
-    Date, EntryLike, MaybeTyped, Numeric, PageRanges, PageRangesPart,
-    biblatex_conversion as conversion,
+    ChunkKind, ChunkedString, Date, EntryLike, FormatString, MaybeTyped, Numeric,
+    PageRanges, PageRangesPart, StringChunk, biblatex_conversion as conversion,
+    csl_language,
 };
 use unic_langid::LanguageIdentifier;
 
@@ -129,53 +130,160 @@ impl EntryLike for Entry {
         variable: StandardVariable,
     ) -> Option<Cow<'_, hayagriva_core::ChunkedString>> {
         match variable {
-            StandardVariable::Abstract => todo!(),
-            StandardVariable::Annote => todo!(),
-            StandardVariable::Archive => todo!(),
-            StandardVariable::ArchiveCollection => todo!(),
-            StandardVariable::ArchiveLocation => todo!(),
-            StandardVariable::ArchivePlace => todo!(),
-            StandardVariable::Authority => todo!(),
-            StandardVariable::CallNumber => todo!(),
-            StandardVariable::CitationKey => todo!(),
-            StandardVariable::CitationLabel => todo!(),
-            StandardVariable::CollectionTitle => todo!(),
-            StandardVariable::ContainerTitle => todo!(),
-            StandardVariable::ContainerTitleShort => todo!(),
-            StandardVariable::Dimensions => todo!(),
-            StandardVariable::Division => todo!(),
-            StandardVariable::DOI => todo!(),
-            StandardVariable::Event => todo!(),
-            StandardVariable::EventTitle => todo!(),
-            StandardVariable::EventPlace => todo!(),
-            StandardVariable::Genre => todo!(),
-            StandardVariable::ISBN => todo!(),
-            StandardVariable::ISSN => todo!(),
-            StandardVariable::Jurisdiction => todo!(),
-            StandardVariable::Keyword => todo!(),
-            StandardVariable::Language => todo!(),
-            StandardVariable::License => todo!(),
-            StandardVariable::Medium => todo!(),
-            StandardVariable::Note => todo!(),
-            StandardVariable::OriginalPublisher => todo!(),
-            StandardVariable::OriginalPublisherPlace => todo!(),
-            StandardVariable::OriginalTitle => todo!(),
-            StandardVariable::PartTitle => todo!(),
-            StandardVariable::PMCID => todo!(),
-            StandardVariable::PMID => todo!(),
-            StandardVariable::Publisher => todo!(),
-            StandardVariable::PublisherPlace => todo!(),
-            StandardVariable::References => todo!(),
-            StandardVariable::ReviewedGenre => todo!(),
-            StandardVariable::ReviewedTitle => todo!(),
-            StandardVariable::Scale => todo!(),
-            StandardVariable::Source => todo!(),
-            StandardVariable::Status => todo!(),
-            StandardVariable::Title => todo!(),
-            StandardVariable::TitleShort => todo!(),
-            StandardVariable::URL => todo!(),
-            StandardVariable::VolumeTitle => todo!(),
-            StandardVariable::YearSuffix => todo!(),
+            StandardVariable::Abstract => self
+                .0
+                .abstract_()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::Annote => self
+                .0
+                .note()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::Archive => None,
+            StandardVariable::ArchiveCollection => None,
+            StandardVariable::ArchiveLocation => None,
+            StandardVariable::ArchivePlace => None,
+            StandardVariable::Authority => self
+                .0
+                .organization()
+                .ok()
+                .map(|v| comma_list(&v))
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::CallNumber => None,
+            StandardVariable::CitationKey => {
+                Some(Cow::Owned(StringChunk::verbatim(&self.0.key).into()))
+            }
+            StandardVariable::CitationLabel => None,
+            StandardVariable::CollectionTitle => None,
+            StandardVariable::ContainerTitle => None,
+            StandardVariable::ContainerTitleShort => None,
+            StandardVariable::Dimensions => None,
+            StandardVariable::Division => None,
+            StandardVariable::DOI => self
+                .0
+                .doi()
+                .ok()
+                .map(|d| Cow::Owned(StringChunk::verbatim(&d).into())),
+            StandardVariable::Event => None,
+            StandardVariable::EventTitle => None,
+            StandardVariable::EventPlace => None,
+            StandardVariable::Genre => None,
+            StandardVariable::ISBN => self
+                .0
+                .isbn()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::ISSN => self
+                .0
+                .issn()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::Jurisdiction => None,
+            StandardVariable::Keyword => self
+                .0
+                .keywords()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::Language => self
+                .0
+                .language()
+                .ok()
+                .as_ref()
+                .and_then(|l| l.first())
+                .and_then(|l| {
+                    if let PermissiveType::Typed(lang) = l {
+                        let id: LanguageIdentifier = (*lang).into();
+                        Some(Cow::Owned(StringChunk::normal(csl_language(&id)).into()))
+                    } else {
+                        None
+                    }
+                })
+                .or_else(|| {
+                    self.0.langid().ok().and_then(|l| {
+                        if let PermissiveType::Typed(lang) = l {
+                            let id: LanguageIdentifier = lang.into();
+                            Some(Cow::Owned(
+                                StringChunk::normal(csl_language(&id)).into(),
+                            ))
+                        } else {
+                            None
+                        }
+                    })
+                }),
+            StandardVariable::License => None,
+            StandardVariable::Medium => None,
+            StandardVariable::Note => self
+                .0
+                .note()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::OriginalPublisher => None,
+            StandardVariable::OriginalPublisherPlace => None,
+            StandardVariable::OriginalTitle => None,
+            StandardVariable::PartTitle => None,
+            StandardVariable::PMCID => None,
+            StandardVariable::PMID => None,
+            StandardVariable::Publisher => self
+                .0
+                .publisher()
+                .ok()
+                .map(|p| comma_list(&p))
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::PublisherPlace => self
+                .0
+                .location()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::References => None,
+            StandardVariable::ReviewedGenre => None,
+            StandardVariable::ReviewedTitle => None,
+            StandardVariable::Scale => None,
+            StandardVariable::Source => None,
+            StandardVariable::Status => self
+                .0
+                .how_published()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::Title => self
+                .0
+                .title()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::TitleShort => self
+                .0
+                .short_title()
+                .ok()
+                .map(chunks_to_fmt_str)
+                .map(|f| f.select(form).clone())
+                .map(Cow::Owned),
+            StandardVariable::URL => self
+                .0
+                .url()
+                .ok()
+                .map(|url| Cow::Owned(StringChunk::verbatim(&url).into())),
+            StandardVariable::VolumeTitle => None,
+            StandardVariable::YearSuffix => panic!("processor must resolve this"),
         }
     }
 
@@ -371,4 +479,34 @@ fn permissive_to_mby_numeric(
 fn chunks_to_mby_numeric(chunks: &[Spanned<Chunk>]) -> MaybeTyped<Numeric> {
     let verb = chunks.format_verbatim();
     MaybeTyped::infallible_from_str(&verb)
+}
+
+fn chunks_to_fmt_str(chunks: &[Spanned<Chunk>]) -> FormatString {
+    FormatString { value: chunks_to_chunked_str(chunks), short: None }
+}
+
+fn chunks_to_chunked_str(chunks: &[Spanned<Chunk>]) -> ChunkedString {
+    let mut res = ChunkedString::new();
+    for chunk in chunks {
+        match &chunk.v {
+            Chunk::Normal(s) => res.push_str(s, ChunkKind::Normal),
+            Chunk::Verbatim(s) => res.push_str(s, ChunkKind::Verbatim),
+            Chunk::Math(s) => res.push_str(s, ChunkKind::Math),
+        }
+    }
+    res
+}
+
+fn comma_list(items: &[Vec<Spanned<Chunk>>]) -> FormatString {
+    let mut value = ChunkedString::new();
+    for (i, entity) in items.iter().enumerate() {
+        if i != 0 {
+            value.push_str(", ", ChunkKind::Normal);
+        }
+
+        let chunked = chunks_to_chunked_str(entity.as_slice());
+        value.extend(chunked);
+    }
+
+    FormatString { value, short: None }
 }

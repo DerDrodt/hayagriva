@@ -260,6 +260,7 @@ dependencies = [
  "roman-numerals-rs",
  "serde",
  "thiserror",
+ "unic-langid",
  "unicode-segmentation",
  "unscanny",
  "url",

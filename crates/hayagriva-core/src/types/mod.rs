@@ -10,6 +10,7 @@ use serde::de::value::StrDeserializer;
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use unic_langid::LanguageIdentifier;
 use url::Url;
 
 pub use numeric::*;
@@ -541,6 +542,16 @@ impl<'de> Deserialize<'de> for SerialNumber {
             }
         })
     }
+}
+
+pub fn csl_language(lang_id: &LanguageIdentifier) -> String {
+    let mut buf = String::with_capacity(if lang_id.region.is_some() { 5 } else { 2 });
+    buf.push_str(lang_id.language.as_str());
+    if let Some(region) = lang_id.region {
+        buf.push('-');
+        buf.push_str(region.as_str());
+    }
+    buf
 }
 
 #[cfg(test)]

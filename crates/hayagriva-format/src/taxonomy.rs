@@ -10,9 +10,8 @@ use citationberg::{
 };
 use hayagriva_core::{
     ChunkedString, Date, EntryLike, EntryType, MaybeTyped, Numeric, PageRanges, Person,
-    PersonRole, Publisher, StringChunk,
+    PersonRole, Publisher, StringChunk, csl_language,
 };
-use unic_langid::LanguageIdentifier;
 
 use crate::citation_label::Alphanumerical;
 
@@ -598,16 +597,6 @@ impl EntryLike for Entry {
     fn is_english(&self) -> Option<bool> {
         self.language().map(|l| l.language.as_str() == "en")
     }
-}
-
-pub(super) fn csl_language(lang_id: &LanguageIdentifier) -> String {
-    let mut buf = String::with_capacity(if lang_id.region.is_some() { 5 } else { 2 });
-    buf.push_str(lang_id.language.as_str());
-    if let Some(region) = lang_id.region {
-        buf.push('-');
-        buf.push_str(region.as_str());
-    }
-    buf
 }
 
 #[cfg(all(test, feature = "biblatex"))]

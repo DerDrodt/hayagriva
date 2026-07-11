@@ -457,7 +457,7 @@ impl Entry {
 
 fn is_non_standard_type(ty: &EntryType, label: &str) -> bool {
     if let EntryType::Unknown(s) = ty
-        && &s.to_lowercase() == label
+        && s.to_lowercase() == label
     {
         true
     } else {

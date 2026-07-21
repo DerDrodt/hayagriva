@@ -10,9 +10,6 @@
 //! these tests (with `--test archiver`) to update the otherwise outdated
 //! files.
 
-extern crate citationberg;
-extern crate serde;
-
 use citationberg::{IndependentStyle, LocaleCode, Style};
 use citationberg::{Locale, LocaleFile, XmlDeError};
 use serde::Serialize;

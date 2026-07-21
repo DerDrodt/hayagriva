@@ -227,10 +227,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hayagriva-biblatex"
-version = "0.10.1"
-
-[[package]]
 name = "hayagriva-cli"
 version = "0.10.1"
 dependencies = [
@@ -238,7 +234,6 @@ dependencies = [
  "citationberg",
  "clap",
  "hayagriva-archive",
- "hayagriva-biblatex",
  "hayagriva-core",
  "hayagriva-csl",
  "hayagriva-format",
@@ -277,7 +272,6 @@ version = "0.10.1"
 dependencies = [
  "biblatex",
  "citationberg",
- "hayagriva-biblatex",
  "hayagriva-core",
  "indexmap",
  "paste",

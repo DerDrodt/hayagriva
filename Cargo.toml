@@ -1,14 +1,5 @@
 [workspace]
-members = [
-  "crates/hayagriva-archive",
-  "crates/hayagriva-biblatex",
-  "crates/hayagriva-cli",
-  "crates/hayagriva-core",
-  "crates/hayagriva-csl",
-  "crates/hayagriva-format",
-  "crates/hayagriva-json",
-  "crates/tests",
-]
+members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]

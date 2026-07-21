@@ -13,7 +13,6 @@ keywords.workspace = true
 citationberg = { workspace = true }
 clap = { version = "4", features = ["cargo", "derive"] }
 hayagriva-archive = { path = "../hayagriva-archive" }
-hayagriva-biblatex = { path = "../hayagriva-biblatex" }
 hayagriva-core = { path = "../hayagriva-core" }
 hayagriva-csl = { path = "../hayagriva-csl" }
 hayagriva-format = { path = "../hayagriva-format" }

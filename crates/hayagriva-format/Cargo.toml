@@ -19,7 +19,6 @@ unic-langid = { workspace = true }
 serde_yaml = "0.9.25"
 unicode-segmentation = { workspace = true }
 hayagriva-core = { path = "../hayagriva-core" }
-hayagriva-biblatex = { path = "../hayagriva-biblatex", optional = true }
 thiserror = { workspace = true }
 unscanny = { workspace = true }
 url = { workspace = true, optional = true }
@@ -28,4 +27,4 @@ url = { workspace = true, optional = true }
 serde_json = "1"
 
 [features]
-biblatex = ["dep:biblatex", "dep:hayagriva-biblatex", "dep:url"]
+biblatex = ["dep:biblatex", "dep:url"]

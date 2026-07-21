@@ -9,11 +9,12 @@ use icu_collator::Collator;
 use icu_collator::options::CollatorOptions;
 use icu_locale::Locale as IcuLocale;
 
+use hayagriva_core::EntryLike;
+
 use crate::BufWriteFormat;
 use crate::rendering::RenderCsl;
 
 use super::{CitationItem, InstanceContext, StyleContext};
-use hayagriva_core::EntryLike;
 
 trait CollationOrd: Ord {
     fn collation_cmp(&self, other: &Self, locale: LocaleCode) -> Ordering;

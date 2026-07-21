@@ -6,18 +6,19 @@ use std::str::FromStr;
 use std::sync::OnceLock;
 use std::{fmt, fs};
 
+use citationberg::json as csl_json;
 use citationberg::taxonomy::Locator;
 use citationberg::{Locale, LocaleCode, Style, XmlDeError};
-use hayagriva_core::test_util::{CACHE_PATH, ensure_repo, iter_files_with_name};
+use unscanny::Scanner;
 
-use citationberg::json as csl_json;
 use hayagriva_archive::{ArchivedStyle, locales};
+use hayagriva_core::test_util::{CACHE_PATH, ensure_repo, iter_files_with_name};
 use hayagriva_csl::{
     BibliographyDriver, BibliographyRequest, CitationItem, CitationRequest, CitePurpose,
     LocatorPayload, SpecificLocator,
 };
-use hayagriva_format::{Entry, io::from_biblatex_str};
-use unscanny::Scanner;
+use hayagriva_format::Entry;
+use hayagriva_format::io::from_biblatex_str;
 
 const TEST_REPO_NAME: &str = "test-suite";
 const TEST_REPO: &str = "https://github.com/citation-style-language/test-suite";

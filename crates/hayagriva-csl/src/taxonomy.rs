@@ -4,10 +4,9 @@ use std::str::FromStr;
 
 use citationberg::LongShortForm;
 use citationberg::taxonomy::{NumberVariable, PageVariable, StandardVariable};
-use hayagriva_core::{
-    EntryLike, PageRanges,
-    types::{ChunkedString, MaybeTyped, Numeric, StringChunk},
-};
+
+use hayagriva_core::types::{ChunkedString, MaybeTyped, Numeric, StringChunk};
+use hayagriva_core::{EntryLike, PageRanges};
 
 use super::{DisambiguateState, InstanceContext, LocatorPayload};
 

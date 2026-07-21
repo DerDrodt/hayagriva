@@ -10,11 +10,11 @@ use tex::{
     Chunk, ChunksExt, DateValue, EditorType, PermissiveType, RetrievalError, Spanned,
     TypeError,
 };
-
 use url::Url;
 
-use super::Entry;
 use hayagriva_core::types::*;
+
+use super::Entry;
 
 macro_rules! tex_kinds {
     ($self:expr, $mv_attr:expr, [$({$kind:pat, $new_kind:expr, $top_level:expr, $expand_mv:expr}),* $(,)*] $(,)*) => {

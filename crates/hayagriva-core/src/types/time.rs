@@ -1,8 +1,6 @@
-use std::{
-    convert::TryInto,
-    fmt::{Debug, Display, Write},
-    str::FromStr,
-};
+use std::convert::TryInto;
+use std::fmt::{Debug, Display, Write};
+use std::str::FromStr;
 
 use citationberg::taxonomy::Season;
 use serde::{Deserialize, Serialize, de};

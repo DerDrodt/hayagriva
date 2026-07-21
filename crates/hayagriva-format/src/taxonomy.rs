@@ -2,17 +2,16 @@
 
 use std::{borrow::Cow, str::FromStr};
 
-use citationberg::{
-    LongShortForm,
-    taxonomy::{
-        DateVariable, Kind, NameVariable, NumberVariable, PageVariable, StandardVariable,
-    },
+use citationberg::LongShortForm;
+use citationberg::taxonomy::{
+    DateVariable, Kind, NameVariable, NumberVariable, PageVariable, StandardVariable,
 };
+use unic_langid::LanguageIdentifier;
+
 use hayagriva_core::{
     ChunkedString, Date, EntryLike, EntryType, MaybeTyped, Numeric, PageRanges, Person,
     PersonRole, Publisher, StringChunk,
 };
-use unic_langid::LanguageIdentifier;
 
 use crate::citation_label::Alphanumerical;
 

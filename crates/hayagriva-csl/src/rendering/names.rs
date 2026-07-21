@@ -10,8 +10,9 @@ use citationberg::{
     ToFormatting,
 };
 
-use crate::{Context, DisambiguateState, ElemMeta, SpecialForm, UsageInfo};
 use hayagriva_core::{EntryLike, Person};
+
+use crate::{Context, DisambiguateState, ElemMeta, SpecialForm, UsageInfo};
 
 use super::{RenderCsl, render_label_with_var};
 

@@ -10,19 +10,18 @@
 //! these tests (with `--test archiver`) to update the otherwise outdated
 //! files.
 
-use citationberg::{IndependentStyle, LocaleCode, Style};
-use citationberg::{Locale, LocaleFile, XmlDeError};
-use serde::Serialize;
 use std::collections::{HashMap, HashSet};
+use std::fmt;
 use std::fmt::Write;
 use std::fs;
 use std::hash::RandomState;
 use std::io::{self, BufReader, Read};
+use std::iter::{self, FromIterator};
 use std::path::{Path, PathBuf};
-use std::{
-    fmt,
-    iter::{self, FromIterator},
-};
+
+use citationberg::{IndependentStyle, LocaleCode, Style};
+use citationberg::{Locale, LocaleFile, XmlDeError};
+use serde::Serialize;
 
 use hayagriva_core::test_util::{
     CACHE_PATH, ensure_repo, iter_files, iter_files_with_name,

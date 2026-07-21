@@ -42,8 +42,6 @@ use citationberg::{
 };
 use clap::builder::PossibleValue;
 use clap::{Arg, ArgAction, Command, ValueEnum, crate_version};
-#[cfg(feature = "biblatex")]
-use hayagriva_format::io::from_biblatex_str;
 use strum::VariantNames;
 
 use hayagriva_archive::{ArchivedStyle, locales};
@@ -51,6 +49,8 @@ use hayagriva_csl::{
     BibliographyDriver, BibliographyRequest, CitationItem, CitationRequest,
     LocatorPayload, SpecificLocator,
 };
+#[cfg(feature = "biblatex")]
+use hayagriva_format::io::from_biblatex_str;
 use hayagriva_format::{Selector, io};
 
 #[derive(Debug, Copy, Clone, PartialEq, VariantNames)]

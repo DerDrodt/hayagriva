@@ -5,16 +5,15 @@
 
 use std::{borrow::Cow, str::FromStr};
 
-use citationberg::{
-    LongShortForm, json as csl_json,
-    taxonomy::{
-        DateVariable, Kind, NameVariable, NumberVariable, PageVariable, StandardVariable,
-    },
+use citationberg::taxonomy::{
+    DateVariable, Kind, NameVariable, NumberVariable, PageVariable, StandardVariable,
 };
+use citationberg::{LongShortForm, json as csl_json};
+use serde::{Deserialize, Serialize};
+
 use hayagriva_core::{
     ChunkedString, Date, EntryLike, MaybeTyped, Numeric, PageRanges, Person, StringChunk,
 };
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash)]
 #[serde(transparent)]

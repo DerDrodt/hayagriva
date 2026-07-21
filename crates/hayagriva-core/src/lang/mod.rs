@@ -1,13 +1,13 @@
 //! Language-dependant string transformations.
 
-pub(crate) mod en;
-pub(crate) mod name;
-
 use std::{fmt::Write, mem};
 
 use citationberg::TextCase;
 
 use crate::types::{FoldableKind, FoldableStringChunk};
+
+pub(crate) mod en;
+pub(crate) mod name;
 
 /// Rules for the title case transformation.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]

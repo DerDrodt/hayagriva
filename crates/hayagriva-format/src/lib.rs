@@ -63,6 +63,22 @@
 #![warn(missing_docs)]
 #![allow(clippy::comparison_chain)]
 
+use std::collections::BTreeMap;
+
+pub use citationberg;
+use indexmap::IndexMap;
+use paste::paste;
+use serde::{Deserialize, Serialize, de::Visitor};
+use unic_langid::LanguageIdentifier;
+
+use hayagriva_core::types::*;
+use hayagriva_core::util::{
+    OneOrMany, deserialize_one_or_many_opt, serialize_one_or_many,
+    serialize_one_or_many_opt,
+};
+
+pub use selectors::{Selector, SelectorError};
+
 #[macro_use]
 mod selectors;
 
@@ -71,21 +87,6 @@ pub mod citation_label;
 mod interop;
 pub mod io;
 mod taxonomy;
-
-use std::collections::BTreeMap;
-
-pub use citationberg;
-pub use selectors::{Selector, SelectorError};
-
-use hayagriva_core::types::*;
-use hayagriva_core::util::{
-    OneOrMany, deserialize_one_or_many_opt, serialize_one_or_many,
-    serialize_one_or_many_opt,
-};
-use indexmap::IndexMap;
-use paste::paste;
-use serde::{Deserialize, Serialize, de::Visitor};
-use unic_langid::LanguageIdentifier;
 
 /// A collection of bibliographic entries.
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]

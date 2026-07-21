@@ -3,20 +3,20 @@
 //! This crate contains data types, traits, and functions used for the
 //! different formats and rendering crates of Hayagriva.
 
+use std::borrow::Cow;
+
+use citationberg::LongShortForm;
+use citationberg::taxonomy;
+use citationberg::taxonomy::{
+    DateVariable, NameVariable, NumberVariable, PageVariable, StandardVariable,
+};
+
+pub use types::*;
+
 pub mod lang;
 pub mod test_util;
 pub mod types;
 pub mod util;
-
-use std::borrow::Cow;
-
-use citationberg::{
-    LongShortForm,
-    taxonomy::{
-        self, DateVariable, NameVariable, NumberVariable, PageVariable, StandardVariable,
-    },
-};
-pub use types::*;
 
 /// Defines an entry for CSL rendering. Implementing this trait enables
 /// interaction between an input format like Hayagriva or CSL-JSON and the CSL

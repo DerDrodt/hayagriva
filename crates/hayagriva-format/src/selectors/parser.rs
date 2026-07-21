@@ -1,7 +1,8 @@
 use std::str::FromStr;
 
-use super::{Selector, SelectorError, SelectorResult};
 use hayagriva_core::types::EntryType;
+
+use super::{Selector, SelectorError, SelectorResult};
 
 /// Parse a selector.
 pub fn parse(src: &str) -> SelectorResult<Selector> {

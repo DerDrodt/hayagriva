@@ -1,10 +1,14 @@
-use std::{cmp::Ordering, fmt::Display, num::TryFromIntError, str::FromStr};
+use std::cmp::Ordering;
+use std::fmt::Display;
+use std::num::TryFromIntError;
+use std::str::FromStr;
+
+use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
 use crate::types::{MaybeTyped, Numeric, NumericError};
 
 use super::{custom_deserialize, serialize_display};
-use serde::{Deserialize, Serialize};
-use thiserror::Error;
 
 impl MaybeTyped<PageRanges> {
     /// Order the values according to CSL rules.

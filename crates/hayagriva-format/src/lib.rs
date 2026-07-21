@@ -68,9 +68,9 @@ mod selectors;
 
 pub mod citation_label;
 #[cfg(feature = "biblatex")]
-pub mod interop;
+mod interop;
 pub mod io;
-pub mod taxonomy;
+mod taxonomy;
 
 use std::collections::BTreeMap;
 

@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash)]
 #[serde(transparent)]
+/// A CSL-JSON item. It is a wrapper around a [csl_json::Item].
 pub struct Item(pub csl_json::Item);
 
 fn resolve_csl_json_standard_variable(

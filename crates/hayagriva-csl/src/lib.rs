@@ -734,7 +734,7 @@ fn date_replacement<T: EntryLike>(
     })])
 }
 
-pub fn write_year<W: std::fmt::Write>(
+pub(crate) fn write_year<W: std::fmt::Write>(
     year: i32,
     short: bool,
     w: &mut W,
@@ -1599,7 +1599,7 @@ pub struct RenderedCitation {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Sorting {
+enum Sorting {
     Variable,
     Macro,
 }
@@ -2703,7 +2703,7 @@ impl IdentifierUsage {
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
-pub enum DisambiguateState {
+enum DisambiguateState {
     #[default]
     None,
     NameDisambiguation(NameDisambiguationProperties),
@@ -2745,7 +2745,7 @@ impl DisambiguateState {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum IbidState {
+enum IbidState {
     /// The previous cite referenced another entry, or this cite has no locator
     /// when the previous one did.
     Different,
@@ -2822,7 +2822,11 @@ impl PartialEq for TransparentLocator {
     }
 }
 
+/// Content of the "transparent" locator. It has to privide a way to check
+/// for equality with other transparent locators for the "ibid" usage.
 pub trait TransparentLocatorPayload: Any {
+    /// Returns `true` iff a locator with this payload is considered equal to
+    /// the locator with payload `other`.
     fn dyn_eq(&self, other: &dyn TransparentLocatorPayload) -> bool;
 }
 

@@ -1,3 +1,5 @@
+//! Utilities for tests in Hayagriva.
+
 use std::{fs, io, path::PathBuf, process::Command};
 
 pub const CACHE_PATH: &str = "../../target/haya-cache";

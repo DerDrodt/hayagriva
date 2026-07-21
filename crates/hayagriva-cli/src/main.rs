@@ -55,11 +55,15 @@ use hayagriva_format::{Selector, io};
 
 #[derive(Debug, Copy, Clone, PartialEq, VariantNames)]
 #[strum(serialize_all = "kebab_case")]
+/// Which input format is expected.
 pub enum Format {
     #[cfg(feature = "biblatex")]
+    /// The bibtex format.
     Bibtex,
     #[cfg(feature = "biblatex")]
+    /// BibLaTeX format.
     Biblatex,
+    /// Hayagriva YAML.
     Yaml,
 }
 
@@ -86,6 +90,9 @@ impl ValueEnum for Format {
 }
 
 #[derive(ValueEnum, Clone)]
+/// CSL locator types. This enum is used to specify the type of locator given
+/// via the `--locators` argument of the `cite` command.
+/// See the `--locator-type` argument.
 enum LocatorTypes {
     Act,
     Appendix,

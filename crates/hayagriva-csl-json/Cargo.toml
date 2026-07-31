@@ -1,5 +1,5 @@
 [package]
-name = "hayagriva-json"
+name = "hayagriva-csl-json"
 description = "CSL-JSON handling for Hayagriva."
 version.workspace = true
 authors.workspace = true

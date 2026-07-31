@@ -224,7 +224,7 @@ struct TestCase {
     mode: TestMode,
     result: String,
     csl: Style,
-    input: Vec<hayagriva_json::Item>,
+    input: Vec<hayagriva_csl_json::Item>,
     bib_entries: Option<Vec<Vec<String>>>,
     bib_section: Option<String>,
     citation_items: Option<Vec<Vec<csl_json::CitationItem>>>,
@@ -539,7 +539,7 @@ where
         panic!("test {} has dependent style", display());
     };
 
-    let mut driver: BibliographyDriver<'_, hayagriva_json::Item> =
+    let mut driver: BibliographyDriver<'_, hayagriva_csl_json::Item> =
         BibliographyDriver::new();
     let mut output = String::new();
     if let Some(cites) = &case.citation_items {
@@ -833,7 +833,7 @@ fn purposes() {
         panic!("test has dependent style");
     };
 
-    let item = hayagriva_json::Item(
+    let item = hayagriva_csl_json::Item(
         serde_json::from_str(
             r#"{
         "id": "ITEM-1",
@@ -863,7 +863,7 @@ fn purposes() {
         (CitePurpose::Year, "2000"),
         (CitePurpose::Full, "Doe, J. (2000). Book A."),
     ] {
-        let mut driver: BibliographyDriver<'_, hayagriva_json::Item> =
+        let mut driver: BibliographyDriver<'_, hayagriva_csl_json::Item> =
             BibliographyDriver::new();
         driver.citation(CitationRequest::new(
             vec![CitationItem::new(&item, None, None, false, Some(purpose))],
@@ -921,7 +921,7 @@ fn case_folding() {
         panic!("test has dependent style");
     };
 
-    let item: hayagriva_json::Item = hayagriva_json::Item(
+    let item: hayagriva_csl_json::Item = hayagriva_csl_json::Item(
         serde_json::from_str(
             r#"{
         "id": "ITEM-1",
@@ -932,7 +932,7 @@ fn case_folding() {
         .unwrap(),
     );
 
-    let mut driver: BibliographyDriver<'_, hayagriva_json::Item> =
+    let mut driver: BibliographyDriver<'_, hayagriva_csl_json::Item> =
         BibliographyDriver::new();
     driver.citation(CitationRequest::new(
         vec![CitationItem::new(&item, None, None, false, None)],

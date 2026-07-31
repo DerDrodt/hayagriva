@@ -265,6 +265,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "hayagriva-csl-json"
+version = "0.10.1"
+dependencies = [
+ "citationberg",
+ "hayagriva-core",
+ "serde",
+]
+
+[[package]]
 name = "hayagriva-format"
 version = "0.10.1"
 dependencies = [
@@ -281,15 +290,6 @@ dependencies = [
  "unicode-segmentation",
  "unscanny",
  "url",
-]
-
-[[package]]
-name = "hayagriva-json"
-version = "0.10.1"
-dependencies = [
- "citationberg",
- "hayagriva-core",
- "serde",
 ]
 
 [[package]]
@@ -758,8 +758,8 @@ dependencies = [
  "hayagriva-archive",
  "hayagriva-core",
  "hayagriva-csl",
+ "hayagriva-csl-json",
  "hayagriva-format",
- "hayagriva-json",
  "heck",
  "regex",
  "serde",

@@ -15,8 +15,8 @@ citationberg = { workspace = true, features = ["json"] }
 hayagriva-archive = { workspace = true }
 hayagriva-core = { workspace = true }
 hayagriva-csl = { workspace = true }
+hayagriva-csl-json = { workspace = true }
 hayagriva-format = { workspace = true, features = ["biblatex"] }
-hayagriva-json = { workspace = true }
 heck = "0.5"
 serde = { workspace = true }
 serde_json = "1"

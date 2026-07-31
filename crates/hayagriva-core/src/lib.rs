@@ -15,6 +15,7 @@ pub use types::*;
 
 pub mod lang;
 pub mod types;
+#[doc(hidden)]
 pub mod util;
 
 /// Defines an entry for CSL rendering. Implementing this trait enables

@@ -10,10 +10,11 @@ use unic_langid::LanguageIdentifier;
 
 use hayagriva_core::{
     ChunkedString, Date, EntryLike, EntryType, MaybeTyped, Numeric, PageRanges, Person,
-    PersonRole, Publisher, StringChunk,
+    StringChunk,
 };
 
 use crate::citation_label::Alphanumerical;
+use crate::types::*;
 
 use super::Entry;
 

@@ -1,16 +1,13 @@
 //! Base types for the bibliography items and their content.
 
 use std::borrow::Cow;
-use std::collections::BTreeMap;
 use std::convert::Infallible;
 use std::fmt::{self, Display};
 use std::str::FromStr;
 
 use serde::de::value::StrDeserializer;
-use serde::ser::SerializeMap;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use url::Url;
 
 pub use numeric::*;
 pub use page::*;
@@ -25,9 +22,10 @@ mod strings;
 mod time;
 
 /// Use the [`Display`] implementation of a type for serialization.
+#[macro_export]
 macro_rules! serialize_display {
     ($t:ty) => {
-        impl Serialize for $t {
+        impl serde::Serialize for $t {
             fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
             where
                 S: serde::Serializer,
@@ -39,23 +37,25 @@ macro_rules! serialize_display {
 }
 
 /// Use the [`FromStr`] implementation of a type for deserialization.
+#[macro_export]
 macro_rules! deserialize_from_str {
     ($t:ty) => {
-        impl<'de> Deserialize<'de> for $t {
+        impl<'de> serde::Deserialize<'de> for $t {
             fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
                 let s = <&'de str>::deserialize(deserializer)?;
-                FromStr::from_str(s).map_err(serde::de::Error::custom)
+                std::str::FromStr::from_str(s).map_err(serde::de::Error::custom)
             }
         }
     };
 }
 
+#[macro_export]
 macro_rules! custom_deserialize {
     ($type_name:ident where $expect:literal $($additional_visitors:item)+) => {
-        impl<'de> Deserialize<'de> for $type_name {
+        impl<'de> serde::Deserialize<'de> for $type_name {
             fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
             where
             D: serde::Deserializer<'de>,
@@ -89,6 +89,7 @@ macro_rules! custom_deserialize {
 
 /// Use the [`FromStr`] implementation of a type for deserialization if it is a
 /// string.
+#[macro_export]
 macro_rules! derive_or_from_str {
     (
         $(#[$global:meta])*
@@ -110,7 +111,7 @@ macro_rules! derive_or_from_str {
         }
 
 
-        crate::types::custom_deserialize!(
+        $crate::types::custom_deserialize!(
             $s where $expect
             fn visit_map<A>(self, map: A) -> Result<Self::Value, A::Error>
                 where A: serde::de::MapAccess<'de>, {
@@ -132,10 +133,10 @@ macro_rules! derive_or_from_str {
     };
 }
 
-use custom_deserialize;
-use derive_or_from_str;
-use deserialize_from_str;
-use serialize_display;
+pub use custom_deserialize;
+pub use derive_or_from_str;
+pub use deserialize_from_str;
+pub use serialize_display;
 
 /// Describes which kind of work a database entry refers to.
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -287,8 +288,6 @@ impl FromStr for EntryType {
 pub enum DeserializationError {
     #[error("malformed date")]
     Date(#[from] time::DateError),
-    #[error("malformed duration")]
-    Duration(#[from] time::DurationError),
     #[error("malformed person")]
     Person(#[from] persons::PersonError),
     #[error("malformed numeric value")]
@@ -380,158 +379,6 @@ where
 impl<T> From<T> for MaybeTyped<T> {
     fn from(t: T) -> Self {
         MaybeTyped::Typed(t)
-    }
-}
-
-derive_or_from_str! {
-    /// An URL, possibly with a last visited date.
-    #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-    pub struct QualifiedUrl where "URL string or dictionary with keys \"url\" and \"date\"" {
-        /// The [Url].
-        pub value: Url,
-        /// The last visited date.
-        #[serde(rename = "date")]
-        pub visit_date: Option<Date>,
-    }
-}
-
-impl Serialize for QualifiedUrl {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        if let Some(date) = &self.visit_date {
-            let mut map = serializer.serialize_map(Some(2))?;
-            map.serialize_entry("value", &self.value)?;
-            map.serialize_entry("date", date)?;
-            map.end()
-        } else {
-            self.value.serialize(serializer)
-        }
-    }
-}
-
-impl QualifiedUrl {
-    /// Create a new qualified URL.
-    pub fn new(value: Url, visit_date: Option<Date>) -> Self {
-        Self { value, visit_date }
-    }
-}
-
-impl FromStr for QualifiedUrl {
-    type Err = url::ParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self { value: Url::parse(s)?, visit_date: None })
-    }
-}
-
-impl Display for QualifiedUrl {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.value.fmt(f)
-    }
-}
-
-derive_or_from_str! {
-    /// A publisher, possibly with a location.
-    #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-    pub struct Publisher where "FormatString string or dictionary with \"name\" and \"location\"" {
-        /// Publisher of the item.
-        name: Option<FormatString>,
-        /// Physical location at which the item was published or created.
-        location: Option<FormatString>,
-    }
-}
-
-impl Serialize for Publisher {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        if let Some(location) = &self.location {
-            let mut map = serializer.serialize_map(Some(2))?;
-            map.serialize_entry("name", &self.name)?;
-            map.serialize_entry("location", location)?;
-            map.end()
-        } else {
-            self.name.serialize(serializer)
-        }
-    }
-}
-
-impl Publisher {
-    /// Create a new publisher.
-    pub fn new(name: Option<FormatString>, location: Option<FormatString>) -> Self {
-        Self { name, location }
-    }
-
-    /// Publisher of the item.
-    pub fn name(&self) -> Option<&FormatString> {
-        self.name.as_ref()
-    }
-
-    /// Physical location at which the item was published or created.
-    pub fn location(&self) -> Option<&FormatString> {
-        self.location.as_ref()
-    }
-}
-
-impl FromStr for Publisher {
-    type Err = ChunkedStrParseError;
-
-    /// Creates a new publisher with `s` as its name and no location.
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Publisher::new(Some(FormatString::from_str(s)?), None))
-    }
-}
-
-/// A set of serial numbers like DOIs, ISBNs, or ISSNs.
-/// Keys should be lowercase.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Hash)]
-#[serde(transparent)]
-pub struct SerialNumber(pub BTreeMap<String, String>);
-
-impl<'de> Deserialize<'de> for SerialNumber {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        #[serde(untagged)]
-        enum Choice {
-            Map(BTreeMap<String, StringOrNumber>),
-            Other(StringOrNumber),
-        }
-
-        #[derive(Deserialize)]
-        #[serde(untagged)]
-        enum StringOrNumber {
-            String(String),
-            Number(i64),
-            UnsignedNumber(u64),
-            Float(f64),
-        }
-
-        impl Display for StringOrNumber {
-            fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                match self {
-                    Self::String(s) => s.fmt(formatter),
-                    Self::Number(n) => n.fmt(formatter),
-                    Self::UnsignedNumber(n) => n.fmt(formatter),
-                    Self::Float(f) => f.fmt(formatter),
-                }
-            }
-        }
-
-        Choice::deserialize(deserializer).map(|choice| match choice {
-            Choice::Other(text) => SerialNumber(BTreeMap::from_iter(vec![(
-                "serial".to_owned(),
-                text.to_string(),
-            )])),
-            Choice::Map(map) => {
-                SerialNumber(map.into_iter().map(|(k, v)| (k, v.to_string())).collect())
-            }
-        })
     }
 }
 

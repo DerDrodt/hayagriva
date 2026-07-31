@@ -77,6 +77,8 @@ use hayagriva_core::util::{
     serialize_one_or_many_opt,
 };
 
+pub use crate::types::*;
+
 pub use selectors::{Selector, SelectorError};
 
 #[macro_use]
@@ -87,6 +89,7 @@ pub mod citation_label;
 mod interop;
 pub mod io;
 mod taxonomy;
+pub mod types;
 
 /// A collection of bibliographic entries.
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]

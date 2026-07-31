@@ -14,6 +14,8 @@ use url::Url;
 
 use hayagriva_core::types::*;
 
+use crate::types::*;
+
 use super::Entry;
 
 macro_rules! tex_kinds {
@@ -664,7 +666,9 @@ fn comma_list(items: &[Vec<Spanned<Chunk>>]) -> FormatString {
 mod tests {
     use unic_langid::LanguageIdentifier;
 
-    use hayagriva_core::types::{EntryType, MaybeTyped, PersonRole};
+    use hayagriva_core::types::{EntryType, MaybeTyped};
+
+    use crate::types::PersonRole;
 
     #[test]
     fn test_pmid_from_biblatex() {

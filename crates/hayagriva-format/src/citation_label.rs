@@ -3,9 +3,10 @@
 use std::fmt::Write;
 use unicode_segmentation::UnicodeSegmentation;
 
-use hayagriva_core::types::{EntryType, Person, PersonRole};
+use hayagriva_core::types::{EntryType, Person};
 
 use crate::Entry;
+use crate::types::PersonRole;
 
 /// Citation labels in the form of numbers.
 ///

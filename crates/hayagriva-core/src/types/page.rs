@@ -3,7 +3,6 @@ use std::fmt::Display;
 use std::num::TryFromIntError;
 use std::str::FromStr;
 
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::types::{MaybeTyped, Numeric, NumericError};

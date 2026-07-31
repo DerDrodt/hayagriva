@@ -22,4 +22,4 @@ unscanny = { workspace = true }
 
 [[test]]
 name = "citeproc"
-path = "tests/citeproc.rs"
+path = "src/citeproc.rs"

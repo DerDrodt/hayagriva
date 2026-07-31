@@ -643,15 +643,11 @@ mod tests {
     #[test]
     fn test_csl() {
         let workspace = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../");
-        let en_locale = fs::read_to_string(
-            workspace.join("crates/tests/tests/data/locales-en-US.xml"),
-        )
-        .unwrap();
+        let en_locale =
+            fs::read_to_string(workspace.join("tests/data/locales-en-US.xml")).unwrap();
         let en_locale = LocaleFile::from_xml(&en_locale).unwrap();
 
-        let yaml =
-            fs::read_to_string(workspace.join("crates/tests/tests/data/basic.yml"))
-                .unwrap();
+        let yaml = fs::read_to_string(workspace.join("tests/data/basic.yml")).unwrap();
         let bib = from_yaml_str(&yaml).unwrap();
         let en_locale = [en_locale.into()];
 
@@ -818,8 +814,7 @@ mod tests {
     fn test_chapter_field() {
         let workspace = Path::new(env!("CARGO_MANIFEST_DIR"));
         let yaml =
-            fs::read_to_string(workspace.join("../../crates/tests/tests/data/basic.yml"))
-                .unwrap();
+            fs::read_to_string(workspace.join("../../tests/data/basic.yml")).unwrap();
         let bib = from_yaml_str(&yaml).unwrap();
         let book = bib.get("lamb").unwrap();
         assert_eq!(book.chapter().unwrap(), &MaybeTyped::Typed(Numeric::new(20)));

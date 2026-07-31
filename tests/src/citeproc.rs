@@ -452,7 +452,7 @@ fn test_single_file() {
 #[test]
 fn test_local_files() {
     let locales = locales();
-    let test_path = PathBuf::from("tests/local");
+    let test_path = PathBuf::from("local");
 
     for path in iter_files_with_name(&test_path, "txt", |_| true) {
         let case = match build_case(&std::fs::read_to_string(&path).unwrap()) {
@@ -886,9 +886,7 @@ fn purposes() {
 /// The file should be located at `tests/citeproc-pass.txt`.
 /// It contains one test case name per line.
 fn load_passing_tests() -> Vec<String> {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests")
-        .join("citeproc-pass.txt");
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("citeproc-pass.txt");
     std::fs::read_to_string(path)
         .unwrap()
         .lines()
@@ -898,11 +896,9 @@ fn load_passing_tests() -> Vec<String> {
 }
 
 /// Write the names of the test cases that should pass to the file
-/// `tests/citeproc-pass.txt`.
+/// `citeproc-pass.txt`.
 fn write_passing_test(tests: &[String]) {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests")
-        .join("citeproc-pass.txt");
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("citeproc-pass.txt");
     let comment = "# This file contains all test cases that should pass.\n\
         # The test fails if a test case in this file fails or if a test case\n\
         # that is not in this file passes.\n#\n\

@@ -221,8 +221,6 @@ version = "0.10.1"
 dependencies = [
  "ciborium",
  "citationberg",
- "hayagriva-core",
- "heck",
  "serde",
 ]
 
@@ -755,13 +753,16 @@ dependencies = [
 name = "tests"
 version = "0.10.1"
 dependencies = [
+ "ciborium",
  "citationberg",
  "hayagriva-archive",
  "hayagriva-core",
  "hayagriva-csl",
  "hayagriva-format",
  "hayagriva-json",
+ "heck",
  "regex",
+ "serde",
  "serde_json",
  "unscanny",
 ]

@@ -19,10 +19,6 @@ keywords = [
 ]
 
 [dependencies]
+ciborium = { workspace = true }
 citationberg = { workspace = true }
 serde = { workspace = true }
-hayagriva-core = { workspace = true }
-ciborium = { workspace = true }
-
-[dev-dependencies]
-heck = "0.5"

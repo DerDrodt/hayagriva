@@ -1,10 +1,11 @@
-//! Utilities for tests in Hayagriva.
+mod archiver;
+mod citeproc;
 
 use std::path::PathBuf;
 use std::process::Command;
 use std::{fs, io};
 
-pub const CACHE_PATH: &str = "../../target/haya-cache";
+pub const CACHE_PATH: &str = "../target/haya-cache";
 
 #[allow(unused)]
 pub fn iter_files<'a>(

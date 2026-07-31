@@ -12,10 +12,10 @@ keywords.workspace = true
 [dependencies]
 citationberg = { workspace = true }
 clap = { version = "4", features = ["cargo", "derive"] }
-hayagriva-archive = { path = "../hayagriva-archive" }
-hayagriva-core = { path = "../hayagriva-core" }
-hayagriva-csl = { path = "../hayagriva-csl" }
-hayagriva-format = { path = "../hayagriva-format" }
+hayagriva-archive = { workspace = true }
+hayagriva-core = { workspace = true }
+hayagriva-csl = { workspace = true }
+hayagriva-format = { workspace = true }
 strum = { version = "0.26", features = ["derive"] }
 biblatex = { workspace = true, optional = true }
 

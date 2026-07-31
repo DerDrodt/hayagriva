@@ -12,7 +12,7 @@ keywords.workspace = true
 [dependencies]
 citationberg = { workspace = true }
 serde = { workspace = true }
-hayagriva-core = { path = "../hayagriva-core" }
+hayagriva-core = { workspace = true }
 ciborium = { workspace = true }
 
 [dev-dependencies]

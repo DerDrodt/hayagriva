@@ -11,11 +11,11 @@ publish = false
 
 [dev-dependencies]
 citationberg = { workspace = true, features = ["json"] }
-hayagriva-archive = { path = "../hayagriva-archive" }
-hayagriva-core = { path = "../hayagriva-core" }
-hayagriva-csl = { path = "../hayagriva-csl" }
-hayagriva-format = { path = "../hayagriva-format", features = ["biblatex"] }
-hayagriva-json = { path = "../hayagriva-json" }
+hayagriva-archive = { workspace = true }
+hayagriva-core = { workspace = true }
+hayagriva-csl = { workspace = true }
+hayagriva-format = { workspace = true, features = ["biblatex"] }
+hayagriva-json = { workspace = true }
 serde_json = "1"
 regex = "1"
 unscanny = { workspace = true }

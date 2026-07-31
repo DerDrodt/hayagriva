@@ -18,7 +18,7 @@ serde = { workspace = true }
 unic-langid = { workspace = true }
 serde_yaml = "0.9.25"
 unicode-segmentation = { workspace = true }
-hayagriva-core = { path = "../hayagriva-core" }
+hayagriva-core = { workspace = true }
 thiserror = { workspace = true }
 unscanny = { workspace = true }
 url = { workspace = true, optional = true }

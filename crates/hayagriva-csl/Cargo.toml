@@ -1,13 +1,20 @@
 [package]
 name = "hayagriva-csl"
-description = "Work with references: Literature database management, storage, and citation formatting"
+description = "Citation Style Language procesor and renderer for Hayagriva."
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 readme.workspace = true
-keywords.workspace = true
+keywords = [
+  "hayagriva",
+  "bibliography",
+  "citation",
+  "reference",
+  "literature",
+  "rendering",
+]
 
 [dependencies]
 citationberg = { workspace = true }

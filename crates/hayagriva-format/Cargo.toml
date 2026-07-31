@@ -1,13 +1,13 @@
 [package]
 name = "hayagriva-format"
-description = "Archived CSL styles and locales for Hayagriva/Typst"
+description = "The bibliography format Hayagriva, used in Typst."
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 readme.workspace = true
-keywords.workspace = true
+keywords = ["hayagriva", "bibliography", "citation", "reference", "literature"]
 
 [dependencies]
 biblatex = { workspace = true, optional = true }

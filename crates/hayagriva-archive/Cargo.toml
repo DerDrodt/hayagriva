@@ -1,13 +1,22 @@
 [package]
 name = "hayagriva-archive"
-description = "Archived CSL styles and locales for Hayagriva/Typst"
+description = "Archived CSL styles and locales for Hayagriva/Typst."
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 readme.workspace = true
-keywords.workspace = true
+keywords = [
+  "hayagriva",
+  "bibliography",
+  "citation",
+  "reference",
+  "literature",
+  "archive",
+  "citation style language",
+  "locales",
+]
 
 [dependencies]
 citationberg = { workspace = true }

@@ -1,12 +1,13 @@
 [package]
 name = "hayagriva-core"
+description = "Core data types and utilities for Hayagriva."
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 readme.workspace = true
-keywords.workspace = true
+keywords = ["hayagriva", "bibliography", "citation", "reference", "literature"]
 
 [dependencies]
 serde = { workspace = true }

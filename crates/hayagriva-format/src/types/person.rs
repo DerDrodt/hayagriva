@@ -41,7 +41,7 @@ pub enum PersonRole {
     Commentator,
     /// Holds a patent or similar.
     Holder,
-    /// Compiled the works in an [Anthology](super::EntryType::Anthology).
+    /// Compiled the works in an [Anthology](hayagriva_core::EntryType::Anthology).
     Compiler,
     /// Founded the publication.
     Founder,

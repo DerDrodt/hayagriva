@@ -29,10 +29,10 @@
 //! };
 //! use citationberg::{LocaleFile, IndependentStyle};
 //!
-//! let en_locale = fs::read_to_string("../tests/tests/data/locales-en-US.xml").unwrap();
+//! let en_locale = fs::read_to_string("../../tests/data/locales-en-US.xml").unwrap();
 //! let locales = [LocaleFile::from_xml(&en_locale).unwrap().into()];
 //!
-//! let style = fs::read_to_string("../tests/tests/data/art-history.csl").unwrap();
+//! let style = fs::read_to_string("../../tests/data/art-history.csl").unwrap();
 //! let style = IndependentStyle::from_xml(&style).unwrap();
 //!
 //! let mut driver = BibliographyDriver::new();

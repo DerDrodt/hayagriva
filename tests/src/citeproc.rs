@@ -132,7 +132,7 @@ impl fmt::Display for TestParseError {
             TestParseError::MissingRequiredSection(s) => {
                 write!(f, "missing required section {s}")
             }
-            TestParseError::CslError(e) => write!(f, "csl error: {e}"),
+            TestParseError::CslError(e) => write!(f, "csl error: {e}; {}", e.source),
             TestParseError::JsonError(e) => write!(f, "json error: {e}"),
         }
     }
@@ -441,6 +441,21 @@ fn test_single_file() {
     let test_path = PathBuf::from(CACHE_PATH)
         .join(TEST_REPO_NAME)
         .join("processor-tests/humans/");
+    let path = test_path.join(name);
+    let case = match build_case(&std::fs::read_to_string(&path).unwrap()) {
+        Ok(c) => c,
+        Err(e) => panic!("Could not parse test {}: {e}", path.to_string_lossy()),
+    };
+    assert!(can_test(&case, || path.display(), true));
+    assert!(test_file(case, &locales, || path.display()));
+}
+
+#[test]
+#[ignore]
+fn test_single_local_file() {
+    let locales = locales();
+    let name = "disamb_Issue507.txt";
+    let test_path = PathBuf::from("tests/local");
     let path = test_path.join(name);
     let case = match build_case(&std::fs::read_to_string(&path).unwrap()) {
         Ok(c) => c,

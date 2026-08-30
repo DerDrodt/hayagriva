@@ -304,13 +304,14 @@ impl<T: EntryLike + Hash + PartialEq + Eq + Debug> BibliographyDriver<'_, T> {
             };
 
             for group in ambiguous.iter() {
+                let len_rerender = rerender.len();
                 // 2a. Name Disambiguation loop
                 disambiguate_names(&res, group, |entry, state| {
                     mark(&mut rerender, entry, state)
                 });
 
-                // Do not try other methods if the previous method succeeded.
-                if !rerender.is_empty() {
+                // Do not try other methods for this group if the previous method succeeded.
+                if rerender.len() > len_rerender {
                     continue;
                 }
 
@@ -319,7 +320,7 @@ impl<T: EntryLike + Hash + PartialEq + Eq + Debug> BibliographyDriver<'_, T> {
                     mark(&mut rerender, entry, state)
                 });
 
-                if !rerender.is_empty() {
+                if rerender.len() > len_rerender {
                     continue;
                 }
 
@@ -1881,17 +1882,10 @@ impl<'a> StyleContext<'a> {
                 }
             }
             (Some(CitePurpose::Prose), _) => {
+                let author_loc = ctx.apply_prefix(&Affixes::default());
                 do_author(&mut ctx);
-                if !self
-                    .csl
-                    .citation
-                    .layout
-                    .prefix
-                    .as_ref()
-                    .is_some_and(|f| f.chars().next().is_some_and(char::is_whitespace))
-                {
-                    ctx.ensure_space();
-                }
+                let has_author = ctx.writing.has_content_since(&author_loc);
+                ctx.apply_suffix(&Affixes::default(), author_loc);
 
                 if self.csl.info.category.iter().any(|c| {
                     matches!(
@@ -1901,6 +1895,14 @@ impl<'a> StyleContext<'a> {
                         }
                     )
                 }) {
+                    if has_author
+                        && !self.csl.citation.layout.prefix.as_ref().is_some_and(|f| {
+                            f.chars().next().is_some_and(char::is_whitespace)
+                        })
+                    {
+                        ctx.ensure_space();
+                    }
+
                     // Print the label.
                     if let Some(prefix) = self.csl.citation.layout.prefix.as_ref() {
                         ctx.push_str(prefix);
@@ -1912,15 +1914,39 @@ impl<'a> StyleContext<'a> {
                 } else {
                     // Print the citation surrounded by parentheses and suppress
                     // the author.
-                    ctx.push_str(
-                        self.csl.citation.layout.prefix.as_deref().unwrap_or("("),
-                    );
+                    let mut prefix = self
+                        .csl
+                        .citation
+                        .layout
+                        .prefix
+                        .clone()
+                        .unwrap_or_else(|| "(".to_string());
+                    if has_author
+                        && !prefix.chars().next().is_some_and(char::is_whitespace)
+                    {
+                        prefix.insert(0, ' ');
+                    }
+                    let affixes = Affixes {
+                        prefix: Some(prefix),
+                        suffix: Some(
+                            self.csl
+                                .citation
+                                .layout
+                                .suffix
+                                .clone()
+                                .unwrap_or_else(|| ")".to_string()),
+                        ),
+                    };
+                    let affix_loc = ctx.apply_prefix(&affixes);
                     ctx.set_special_form(Some(SpecialForm::SuppressAuthor));
                     do_regular(&mut ctx);
                     ctx.set_special_form(None);
-                    ctx.push_str(
-                        self.csl.citation.layout.suffix.as_deref().unwrap_or(")"),
-                    );
+                    if has_author {
+                        ctx.apply_suffix(&affixes, affix_loc);
+                    } else {
+                        ctx.push_str(affixes.suffix.as_deref().unwrap());
+                        ctx.commit_elem(affix_loc.0, None, None);
+                    }
                 }
             }
             (Some(CitePurpose::Year) | Some(CitePurpose::Full) | None, _) => {

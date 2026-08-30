@@ -1062,6 +1062,92 @@ mod tests {
     }
 
     #[test]
+    fn issue_347() {
+        let bibtex = r#"@book{pratchett96,
+            title = {Eric},
+            author = {Pratchett, T.},
+            year = {1996},
+            publisher = {Vista}
+        }"#;
+
+        let library = crate::io::from_biblatex_str(bibtex).unwrap();
+        let mla = hayagriva_archive::ArchivedStyle::ModernLanguageAssociation.get();
+        let citationberg::Style::Independent(mla) = mla else { unreachable!() };
+        let entry = library.iter().next().unwrap();
+        let locales = hayagriva_archive::locales();
+
+        let mut driver = BibliographyDriver::new();
+        driver.citation(CitationRequest::new(
+            vec![CitationItem::with_entry(entry).kind(CitePurpose::Prose)],
+            &mla,
+            None,
+            &locales,
+            None,
+        ));
+        let rendered = driver.finish(BibliographyRequest::new(&mla, None, &locales));
+        let mut output = String::new();
+        rendered.citations[0]
+            .citation
+            .write_buf(&mut output, BufWriteFormat::Plain)
+            .unwrap();
+
+        assert_eq!(output, "Pratchett");
+    }
+
+    #[test]
+    /// A webpage with only a year (no month/day) as its issued date must not render a dangling delimiter before the (empty) month/day part.
+    ///
+    /// See https://github.com/typst/hayagriva/issues/246
+    fn issue_year_only_date_apa() {
+        let yaml = r#"
+        nistCVE:
+            type: Web
+            author: "NIST"
+            title: "CVE-2021-44228"
+            date: "2021"
+            url:
+                value: "https://nvd.nist.gov/vuln/detail/CVE-2021-44228"
+                date: 2024-10-28
+        "#;
+
+        let library = from_yaml_str(yaml).unwrap();
+        let apa =
+            hayagriva_archive::ArchivedStyle::AmericanPsychologicalAssociation.get();
+        let citationberg::Style::Independent(apa) = apa else { unreachable!() };
+        let locales = hayagriva_archive::locales();
+
+        let mut driver = BibliographyDriver::new();
+        driver.citation(CitationRequest::new(
+            vec![CitationItem::with_entry(library.iter().next().unwrap())],
+            &apa,
+            None,
+            &locales,
+            None,
+        ));
+
+        let finished = driver.finish(BibliographyRequest {
+            style: &apa,
+            locale: None,
+            locale_files: &locales,
+        });
+
+        let mut bib_entry = String::new();
+        finished
+            .bibliography
+            .unwrap()
+            .items
+            .remove(0)
+            .content
+            .write_buf(&mut bib_entry, BufWriteFormat::Plain)
+            .unwrap();
+
+        assert_eq!(
+            bib_entry,
+            "NIST. (2021). CVE-2021-44228. https://nvd.nist.gov/vuln/detail/CVE-2021-44228"
+        );
+    }
+
+    #[test]
     fn ibid_handling_with_deutsche_sprache_csl() {
         let bibtex = r#"@book{ITEM,
             title = {A},
